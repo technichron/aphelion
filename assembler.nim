@@ -43,10 +43,11 @@ proc level1pass(f: string): string =
 
 
 proc main() = 
-    #L1 ASM pass
+    
     let assemblyFile = readFile("sample.asm")
 
     let binaryFile = level1pass(assemblyFile)
+
     writeFile("binary.bin", binaryFile)
     
 
