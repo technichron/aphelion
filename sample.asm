@@ -1,8 +1,8 @@
 # comment
 @define out, 0x0FF
-main:
-    set a, 0x00
-    loop:
+$main:
+    set a, 0x00 #sets A register
+    $loop:
         add a, 0d01
         str a, 0x00AB
         str a, out
