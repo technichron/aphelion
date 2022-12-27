@@ -2,7 +2,7 @@ import std/strutils, std/sequtils
 
 # APHELION assembler
 
-proc level1pass(f: string): string =
+proc levelOneFlatten(f: string): seq[string] =
 
     var file = splitLines(f)    # deliniate
 
@@ -29,24 +29,37 @@ proc level1pass(f: string): string =
     
     for i in file.low()..file.high():
         for definition in defineList:
-            file[i] = file[i].replaceWord(definition[0],definition[1])
+            file[i] = file[i].replaceWord(definition[0], definition[1])
 
     file = file.filterIt(it.len != 0)
-
-    for i in file.low()..file.high():
-        echo file[i]
-
-
     
+    result = file
 
-    var instructionSequence: seq[string]
+proc getDataType(value: string): string =
+    return value[0..1]
+
+proc levelOneBinaryConversion(input: seq[string]): string =
+
+    for line in input:
+        case line.split()[0]
+        of "nop", "NOP":
+            result.add("00000000")
+
+        of "set", "SET":
+            result.add("0001")
+            echo line.split()[2]
+
+        else: discard
+        result.add(" ")
 
 
 proc main() = 
-    
-    let assemblyFile = readFile("sample.asm")
 
-    let binaryFile = level1pass(assemblyFile)
+    let raw = readFile("sample.asm")
+
+    let flattened = levelOneFlatten(raw)
+
+    let binaryFile = levelOneBinaryConversion(flattened)
 
     writeFile("binary.bin", binaryFile)
     
