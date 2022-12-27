@@ -53,30 +53,12 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <a name="clabel" val=""/>
     <a name="clabelup" val="east"/>
     <a name="clabelfont" val="SansSerif plain 12"/>
-    <wire from="(660,110)" to="(660,440)"/>
-    <wire from="(540,110)" to="(540,440)"/>
+    <wire from="(320,110)" to="(320,140)"/>
     <wire from="(90,110)" to="(90,440)"/>
-    <wire from="(420,110)" to="(420,440)"/>
-    <wire from="(270,110)" to="(270,440)"/>
-    <comp lib="0" loc="(420,110)" name="Pin">
+    <comp lib="0" loc="(320,110)" name="Pin">
       <a name="width" val="8"/>
       <a name="tristate" val="false"/>
-      <a name="label" val="arg1"/>
-    </comp>
-    <comp lib="0" loc="(540,110)" name="Pin">
-      <a name="width" val="8"/>
-      <a name="tristate" val="false"/>
-      <a name="label" val="arg2"/>
-    </comp>
-    <comp lib="0" loc="(270,110)" name="Pin">
-      <a name="width" val="4"/>
-      <a name="tristate" val="false"/>
-      <a name="label" val="opcode"/>
-    </comp>
-    <comp lib="0" loc="(660,110)" name="Pin">
-      <a name="width" val="8"/>
-      <a name="tristate" val="false"/>
-      <a name="label" val="arg3"/>
+      <a name="label" val="instruction"/>
     </comp>
     <comp lib="0" loc="(90,110)" name="Clock"/>
   </circuit>

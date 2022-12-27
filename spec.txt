@@ -1,8 +1,0 @@
-APHELION
-
-12-bit address
-
-instructions
-MOV addr1, addr2  -  move val at addr1 to addr2
-ADD 
-ADC -
