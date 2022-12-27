@@ -1,4 +1,4 @@
-import std/strutils
+import std/strutils, std/sequtils
 
 # APHELION assembler
 
@@ -11,24 +11,35 @@ proc level1pass(f: string): string =
     for i in file.low()..file.high():                               # strip leading and trailing whitespace
         file[i] = strip(file[i])
 
-    var delSeq: seq[int]
     for i in file.low()..file.high():                               # remove comments
-        if file[i][0] == '#': delSeq.add(i)
-    for i in delSeq:
-        file.delete(i)
+        if file[i][0] == '#': file[i] = ""
     
     for i in file.low()..file.high():
         file[i] = file[i].split("#")[0]
     
-    for i in file.low()..file.high():                               # strip leading and trailing whitespace
+    for i in file.low()..file.high():                               # strip leading and trailing whitespace again
         file[i] = strip(file[i])
     
+    var defineList: seq[array[2, string]]                       # sequence of definition statements to replace
+    for i in file.low()..file.high():                               # in the format of ["name","value"]
+        let line = file[i].split()
+        if line[0] == "@define":
+            defineList.add([line[1].replace(",", ""), line[2]])
+            file[i] = ""
+    
     for i in file.low()..file.high():
-        if file[i]
+        for definition in defineList:
+            file[i] = file[i].replaceWord(definition[0],definition[1])
+
+    file = file.filterIt(it.len != 0)
+
+    for i in file.low()..file.high():
+        echo file[i]
+
 
     
 
-    var instructionSequence = 
+    var instructionSequence: seq[string]
 
 
 proc main() = 
