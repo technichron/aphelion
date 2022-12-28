@@ -1,4 +1,4 @@
-# comment this lmao
+# comment
 @define out, 0x0FF
 @define address, 0x00AB
 main:

@@ -1,5 +1,8 @@
-set b 0x0F
+jmp main
+main:
+set a 0x00
 loop:
-add b 0x01
-str b 0x07FF
+add a 0d03
+str a 0x00AB
+str a 0x0FF
 jmp loop

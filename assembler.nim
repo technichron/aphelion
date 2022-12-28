@@ -2,6 +2,8 @@ import std/strutils, std/sequtils
 
 # APHELION assembler V1.0
 
+const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
+
 proc seqStringToString(s: seq[string]): string =
     for i in s.low()..s.high():
         result.add(s[i])
@@ -87,8 +89,12 @@ proc levelOneFlatten(f: string): seq[string] =
     for i in file.low()..file.high():
         file[i] = file[i].replace(",")
 
-    file = file.filterIt(it.len != 0)
+    file = file.filterIt(it.len != 0)                                   # filter out zero-length entries
+
+    file = concat(@["jmp main"], file)
     
+
+
     result = file
 
 proc levelOneBinaryConversion(input: seq[string]): string =
@@ -241,11 +247,11 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
 
-        of "not", "NOT":                                                                        #not
+        of "not", "NOT":                                                                        # not
             result.add("11000")
             result.add(getRegisterCode(line.split()[1]))
 
-        of "cmp", "CMP":                                                                        #cmp
+        of "cmp", "CMP":                                                                        # cmp
             result.add("1101")
 
             case getDataType(line.split()[2])
@@ -261,7 +267,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
 
-        of "jmp", "JMP":
+        of "jmp", "JMP":                                                                        # jmp
             result.add("1000")
 
             case line.split()[1]
@@ -269,10 +275,19 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("0000")
             else:
                 result.add("1000 ")
-                result.add("@")
                 result.add(line.split()[1])
 
-        #of "jnz", "JNZ":
+        of "jnz", "JNZ":                                                                        # jnz
+            result.add("1001")
+
+            case line.split()[1]
+            of "hl", "HL":
+                result.add("0000")
+            else:
+                result.add("1000 ")
+                result.add(line.split()[1])
+
+
         else:
             result.add(line)
 
@@ -280,20 +295,58 @@ proc levelOneBinaryConversion(input: seq[string]): string =
     
     result.delete(0..0)
 
+
+    # ----------------------- jmp / jnz reference processor ---------------------- #
+
+    var byteList = result.split(' ')
+    var tempByteList = byteList
+
+    var alias = ""
     var byteNumber = 0
-    for line in result.split(' '):                                                     # jmp / jnz processor
-        if line[line.high()] == ':':
-            echo line
-            echo byteNumber
 
+    var offset = 1
+    for i in byteList.low()..byteList.high(): # ADD EMPTY STRING AFTER JUMP REFERENCES - CHECK IF STRING ONLY CONTAINS LETTERS
+        if not (contains(byteList[i], Digits) or contains(byteList[i], PunctuationChars)):
+            tempByteList.insert(" ", i+offset)
+            offset += 1
+    
+    byteList = tempByteList
+
+    while true:
+
+        alias = ""
+        byteNumber = 0
+
+        for line in byteList:
+            if line[line.high()] == ':':
+                alias = line[0..<line.high()]
+                break
+            byteNumber += 1
         
+        if byteNumber == len(byteList): break
 
-        byteNumber += 1
+        echo alias
+        echo byteNumber
 
+        for l in byteList.low()..byteList.high():
+            if byteList[l] == alias:
+                byteList[l] = insertSep(toBin(byteNumber, 16), ' ', 8)
+    
+        byteList.delete(byteNumber)
+    
+    
+    result = ""
+    for b in byteList:
+        if isEmptyOrWhitespace(b):
+            continue
+        result.add(b)
+        result.add(" ")
+    
+    
 
 proc main() = 
 
-    let raw = readFile("sample2.asm")
+    let raw = readFile("sample.asm")
 
     let flattened = levelOneFlatten(raw)
 
