@@ -1,4 +1,4 @@
-# comment
+# comment this lmao
 @define out, 0x0FF
 @define address, 0x00AB
 $main:

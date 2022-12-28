@@ -1,12 +1,65 @@
 import std/strutils, std/sequtils
 
-# APHELION assembler
+# APHELION assembler V1.0
+
+proc seqStringToString(s: seq[string]): string =
+    for i in s.low()..s.high():
+        result.add(s[i])
+        result.add("\n")
+
+proc getDataType(value: string): string =
+    case value[0]
+    of '0': #number
+        result = $value[1] # x - hex, b - binary, d - decimal, o - octal
+    of 'a','A','b','B','c','C','d','D','z','Z','l','L','h','H','f','F':
+        result = "register"
+    else:
+        result = "error"
+
+proc getRegisterCode(value: string): string =
+    case value:
+    of "a", "A":
+        result = "000"
+    of "b", "B":
+        result = "001"
+    of "c", "C":
+        result = "010"
+    of "d", "D":
+        result = "011"
+    of "e", "E":
+        result = "100"
+    of "l", "L":
+        result = "101"
+    of "h", "H":
+        result = "110"
+    of "f", "F":
+        result = "111"
+    else: discard
+
+proc numToBin(num: string, len: int): string =
+    var decimal: int
+    case getDataType(num)
+    of "x":
+        decimal = fromHex[int](num)
+    of "b":
+        decimal = fromBin[int](num)
+    of "d":
+        decimal = parseInt(num[2..len(num)-1])
+    of "o":
+        decimal = fromOct[int](num)
+
+    if len == 8:
+        result = toBin(decimal, 8)
+    if len == 16:
+        result = insertSep(toBin(decimal, 16), ' ', 8)
 
 proc levelOneFlatten(f: string): seq[string] =
 
     var file = splitLines(f)    # deliniate
 
     #result = $char(fromHex[uint]("61"))
+
+    file = file.filterIt(it.len != 0)
 
     for i in file.low()..file.high():                               # strip leading and trailing whitespace
         file[i] = strip(file[i])
@@ -24,44 +77,83 @@ proc levelOneFlatten(f: string): seq[string] =
     for i in file.low()..file.high():                               # in the format of ["name","value"]
         let line = file[i].split()
         if line[0] == "@define":
-            defineList.add([line[1].replace(",", ""), line[2]])
+            defineList.add([line[1].replace(","), line[2]])
             file[i] = ""
     
     for i in file.low()..file.high():
         for definition in defineList:
             file[i] = file[i].replaceWord(definition[0], definition[1])
+    
+    for i in file.low()..file.high():
+        file[i] = file[i].replace(",")
 
     file = file.filterIt(it.len != 0)
     
     result = file
 
-proc getDataType(value: string): string =
-    return value[0..1]
-
 proc levelOneBinaryConversion(input: seq[string]): string =
 
     for line in input:
         case line.split()[0]
-        of "nop", "NOP":
+
+
+        of "nop", "NOP":                                                                    # nop
             result.add("00000000")
 
-        of "set", "SET":
+        of "set", "SET":                                                                    # set
             result.add("0001")
-            echo line.split()[2]
 
-        else: discard
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
+
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
+        
+        of "ldr", "LDR":                                                                        #ldr
+            result.add("0010")
+
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 16))
+            
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+        
+        of "str", "STR":
+            result.add("0")
+
+
+
+
+
+
+
+        else:
+            discard
+
         result.add(" ")
-
 
 proc main() = 
 
-    let raw = readFile("sample.asm")
+    let raw = readFile("sample2.asm")
 
     let flattened = levelOneFlatten(raw)
 
     let binaryFile = levelOneBinaryConversion(flattened)
 
-    writeFile("binary.bin", binaryFile)
+    writeFile("flattened.txt", seqStringToString(flattened))
+    writeFile("binary.txt", binaryFile)
     
 
 
