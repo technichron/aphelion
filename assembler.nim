@@ -94,9 +94,10 @@ proc levelOneFlatten(f: string): seq[string] =
 proc levelOneBinaryConversion(input: seq[string]): string =
 
     for line in input:
+
+        result.add(" ")
+
         case line.split()[0]
-
-
         of "nop", "NOP":                                                                    # nop
             result.add("00000000")
 
@@ -116,7 +117,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
         
-        of "ldr", "LDR":                                                                        #ldr
+        of "ldr", "LDR":                                                                        # ldr
             result.add("0010")
 
             case getDataType(line.split()[2])
@@ -130,19 +131,165 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("0")
                 result.add(getRegisterCode(line.split()[1]))
         
-        of "str", "STR":
-            result.add("0")
+        of "str", "STR":                                                                        # str
+            result.add("0011")
 
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 16))
+            
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+            
+        of "add", "ADD":                                                                        # add
+            result.add("0100")
 
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
 
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
+            
+        of "adc", "ADC":                                                                        # adc
+            result.add("0101")
 
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
 
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
 
+        of "sub", "SUB":                                                                        # sub
+            result.add("0110")
 
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
+
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
+
+        of "sbb", "SBB":                                                                        # sbb
+            result.add("0111")
+
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
+
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
+
+        of "and", "AND":                                                                        # and
+            result.add("1010")
+
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
+
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
+
+        of "or", "OR":                                                                            # or
+            result.add("1011")
+
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
+
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
+
+        of "not", "NOT":                                                                        #not
+            result.add("11000")
+            result.add(getRegisterCode(line.split()[1]))
+
+        of "cmp", "CMP":                                                                        #cmp
+            result.add("1101")
+
+            case getDataType(line.split()[2])
+            of "x", "b","d", "o":
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" ")
+                result.add(numToBin(line.split()[2], 8))
+
+            else:
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
+                result.add(" 00000")
+                result.add(getRegisterCode(line.split()[2]))
+
+        of "jmp", "JMP":
+            result.add("1000")
+
+            case line.split()[1]
+            of "hl", "HL":
+                result.add("0000")
+            else:
+                result.add("1000 ")
+                result.add("@")
+                result.add(line.split()[1])
+
+        #of "jnz", "JNZ":
         else:
-            discard
+            result.add(line)
 
-        result.add(" ")
+        
+    
+    result.delete(0..0)
+
+    var byteNumber = 0
+    for line in result.split(' '):                                                     # jmp / jnz processor
+        if line[line.high()] == ':':
+            echo line
+            echo byteNumber
+
+        
+
+        byteNumber += 1
+
 
 proc main() = 
 
