@@ -1,6 +1,6 @@
 # comment
-@define out, 0x0FF
-@define address, 0x00AB
+@define out, 0xFFFF
+@define address, 0x9001
 main:
     loop:
         add a, 0d03

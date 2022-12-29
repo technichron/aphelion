@@ -1,6 +1,7 @@
-import std/strutils, std/sequtils
+# APHELION ASSEMBLER 1.0
+# BY TECHNICHRON
 
-# APHELION assembler V1.0
+import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
@@ -54,7 +55,6 @@ proc numToBin(num: string, len: int): string =
         result = toBin(decimal, 8)
     if len == 16:
         result = insertSep(toBin(decimal, 16), ' ', 8)
-
 
 proc levelOneFlatten(f: string): seq[string] =
 
@@ -291,9 +291,11 @@ proc levelOneBinaryConversion(input: seq[string]): string =
 
             case line.split()[1]
             of "hl", "HL":
-                result.add("0000")
+                result.add("0")
+                result.add(getRegisterCode(line.split()[1]))
             else:
-                result.add("1000 ")
+                result.add("1")
+                result.add(getRegisterCode(line.split()[1]))
                 result.add(line.split()[1])
 
         else:
@@ -356,7 +358,7 @@ proc txtToBin(inText: string): string =
 
 proc main() = 
 
-    let raw = readFile("assembler/sample2.asm")
+    let raw = readFile("assembler/sample.asm")
 
     let flattened = levelOneFlatten(raw)
 
