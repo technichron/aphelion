@@ -1,8 +1,0 @@
-jmp main
-main:
-set a 0x00
-loop:
-add a 0d03
-str a 0x00AB
-str a 0x0FF
-jmp loop

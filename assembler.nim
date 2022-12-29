@@ -76,6 +76,8 @@ proc levelOneFlatten(f: string): seq[string] =
     for i in file.low()..file.high():                               # strip leading and trailing whitespace again
         file[i] = strip(file[i])
     
+    echo "cleansed..."
+    
     var defineList: seq[array[2, string]]                       # sequence of definition statements to replace
     for i in file.low()..file.high():                               # in the format of ["name","value"]
         let line = file[i].split()
@@ -87,12 +89,20 @@ proc levelOneFlatten(f: string): seq[string] =
         for definition in defineList:
             file[i] = file[i].replaceWord(definition[0], definition[1])
     
+    echo "definitions resolved..."
+
     for i in file.low()..file.high():
         file[i] = file[i].replace(",")
 
     file = file.filterIt(it.len != 0)                                   # filter out zero-length entries
 
-    file = concat(@["jmp main"], file)
+    var hasMainLabel = false
+    for i in file.low()..file.high():
+        if file[i] == "main:":
+            hasMainLabel = true
+
+    if hasMainLabel:
+        file = concat(@["jmp main"], file)
 
     result = file
 
@@ -291,6 +301,8 @@ proc levelOneBinaryConversion(input: seq[string]): string =
     
     result.delete(0..0)
 
+    echo "instructions converted..."
+
     # ----------------------- jmp / jnz reference processor ---------------------- #
 
     var byteList = result.split(' ')
@@ -320,15 +332,14 @@ proc levelOneBinaryConversion(input: seq[string]): string =
         
         if byteNumber == len(byteList): break
 
-        echo alias
-        echo byteNumber
-
         for l in byteList.low()..byteList.high():
             if byteList[l] == alias:
                 byteList[l] = insertSep(toBin(byteNumber, 16), ' ', 8)
     
         byteList.delete(byteNumber)
+
     
+    echo "jumps resolved..."
     
     result = ""
     for b in byteList:
@@ -337,15 +348,25 @@ proc levelOneBinaryConversion(input: seq[string]): string =
         result.add(b)
         result.add(" ")
 
+proc txtToBin(inText: string): string =
+    for b in inText.split(' '):
+        if isEmptyOrWhitespace(b) == false:
+            result.add($char(fromBin[uint8](b)))
+
+
 proc main() = 
 
     let raw = readFile("sample.asm")
 
     let flattened = levelOneFlatten(raw)
 
-    let binaryFile = levelOneBinaryConversion(flattened)
+    let binaryTextFile = levelOneBinaryConversion(flattened)
+    let binaryFile = txtToBin(binaryTextFile)
 
-    writeFile("flattened.txt", seqStringToString(flattened))
-    writeFile("binary.txt", binaryFile)
+    # writeFile("flattened.txt", seqStringToString(flattened))
+    writeFile("output.txt", binaryTextFile)
+    writeFile("output.bin", binaryFile)
+
+    echo "done!"
     
 main()
