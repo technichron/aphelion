@@ -356,7 +356,7 @@ proc txtToBin(inText: string): string =
 
 proc main() = 
 
-    let raw = readFile("sample.asm")
+    let raw = readFile("assembler/sample2.asm")
 
     let flattened = levelOneFlatten(raw)
 
@@ -364,8 +364,8 @@ proc main() =
     let binaryFile = txtToBin(binaryTextFile)
 
     # writeFile("flattened.txt", seqStringToString(flattened))
-    writeFile("output.txt", binaryTextFile)
-    writeFile("output.bin", binaryFile)
+    writeFile("assembler/output.txt", binaryTextFile)
+    writeFile("assembler/output.bin", binaryFile)
 
     echo "done!"
     
