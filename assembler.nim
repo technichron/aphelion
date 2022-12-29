@@ -55,6 +55,7 @@ proc numToBin(num: string, len: int): string =
     if len == 16:
         result = insertSep(toBin(decimal, 16), ' ', 8)
 
+
 proc levelOneFlatten(f: string): seq[string] =
 
     var file = splitLines(f)    # deliniate
@@ -92,8 +93,6 @@ proc levelOneFlatten(f: string): seq[string] =
     file = file.filterIt(it.len != 0)                                   # filter out zero-length entries
 
     file = concat(@["jmp main"], file)
-    
-
 
     result = file
 
@@ -287,14 +286,10 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("1000 ")
                 result.add(line.split()[1])
 
-
         else:
             result.add(line)
-
-        
     
     result.delete(0..0)
-
 
     # ----------------------- jmp / jnz reference processor ---------------------- #
 
@@ -341,8 +336,6 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             continue
         result.add(b)
         result.add(" ")
-    
-    
 
 proc main() = 
 
@@ -355,10 +348,4 @@ proc main() =
     writeFile("flattened.txt", seqStringToString(flattened))
     writeFile("binary.txt", binaryFile)
     
-
-
-
-
-
-
 main()
