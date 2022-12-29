@@ -4,10 +4,10 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-proc seqStringToString(s: seq[string]): string =
-    for i in s.low()..s.high():
-        result.add(s[i])
-        result.add("\n")
+# proc seqStringToString(s: seq[string]): string =
+#     for i in s.low()..s.high():
+#         result.add(s[i])
+#         result.add("\n")
 
 proc getDataType(value: string): string =
     case value[0]
