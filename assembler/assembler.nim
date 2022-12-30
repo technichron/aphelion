@@ -5,13 +5,13 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-const asmfile = "assembler/sample2.asm"
+const asmfile = "assembler/sample.asm"
 
 
-# proc seqStringToString(s: seq[string]): string =
-#     for i in s.low()..s.high():
-#         result.add(s[i])
-#         result.add("\n")
+proc seqStringToString(s: seq[string]): string =
+    for i in s.low()..s.high():
+        result.add(s[i])
+        result.add("\n")
 
 proc getDataType(value: string): string =
     case value[0]
@@ -298,14 +298,15 @@ proc levelOneBinaryConversion(input: seq[string]): string =
         of "jnz", "JNZ":                                                                        # jnz
             result.add("1001")
 
-            case line.split()[1]
+            case line.split()[2]
             of "hl", "HL":
                 result.add("0")
                 result.add(getRegisterCode(line.split()[1]))
             else:
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
-                result.add(line.split()[1])
+                result.add(" ")
+                result.add(line.split()[2])
         
         of "halt", "HALT":
             result.add("11111111")
@@ -377,7 +378,7 @@ proc main() =
     let binaryTextFile = levelOneBinaryConversion(flattened)
     let binaryFile = txtToBin(binaryTextFile)
 
-    # writeFile("flattened.txt", seqStringToString(flattened))
+    #writeFile("flattened.txt", seqStringToString(flattened))
     writeFile("assembler/output.txt", binaryTextFile)
     writeFile("assembler/output.bin", binaryFile)
 

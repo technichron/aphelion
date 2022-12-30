@@ -1,0 +1,10 @@
+jmp main
+main:
+set a 0x21
+set b 0x5A
+loop:
+sw a 0xFFFF
+add a 0d01
+sub b 0d01
+jmp b loop
+halt

@@ -1,8 +1,16 @@
-# comment
 @define out, 0xFFFF
 @define address, 0x9001
+
+@define asciistart, 0x41
+@define asciiend, 0x5B
+
 main:
-    set a, 0d104
+    set a, asciistart
+    set b, asciiend
+    sub b, asciistart
     loop:
+
         sw a, out
-        jmp loop
+        add a, 0d01 
+        sub b, 0d01 
+        jnz b, loop

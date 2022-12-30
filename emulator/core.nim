@@ -1,11 +1,11 @@
 # APHELION EMULATOR 1.0
 # BY TECHNICHRON
 
-import std/strutils, std/sequtils, std/bitops
+import std/bitops
 
 # ----------------------------------- setup ---------------------------------- #
 
-var Memory: array[65536, uint8]
+var Memory: array[65536, uint8] # 64k
 
 var ProgramCounter:uint16 = 0
 var CurrentInstructionBuffer: array[3, uint8]
@@ -18,11 +18,11 @@ var Registers: array[8, uint8]
 # E - 0b100 - general
 # L - 0b101 - general / low index register
 # H - 0b110 - general / high index register
-# F - 0b111 - flags: 000, carry, borrow, equal, less, zero
+# F - 0b111 - flags: 000CBELZ - CARRY, BORROW, EQUAL, LESS, ZERO
 
 var running = true
 
-proc binConcat(a,b: uint8): uint16 = uint16(a*256 + b)
+proc binConcat(h,l: uint8): uint16 = uint16(h*256 + l)
 
 proc getHL(): uint16 = binConcat(Registers[0b110], Registers[0b101])
 
@@ -55,8 +55,42 @@ proc getInstructionLength(instruction: uint8): int =
     else:
         result = 0
 
+proc setFlag(name: string, value: bool = true) =
+    case name
+    of "carry","CARRY":
+        Registers[0b111].setBits(4)
+    of "borrow","BORROW":
+        Registers[0b111].setBits(3)
+    of "equal","EQUAL":
+        Registers[0b111].setBits(2)
+    of "less","LESS":
+        Registers[0b111].setBits(1)
+    of "zero","ZERO":
+        Registers[0b111].setBits(0)
+    else:
+        discard
+
+proc getFlag(name: string):bool =
+    case name
+    of "carry","CARRY":
+        result = Registers[0b111].testBit(4)
+    of "borrow","BORROW":
+        result = Registers[0b111].testBit(3)
+    of "equal","EQUAL":
+        result = Registers[0b111].testBit(2)
+    of "less","LESS":
+        result = Registers[0b111].testBit(1)
+    of "zero","ZERO":
+        result = Registers[0b111].testBit(0)
+    else:
+        discard
+
 proc read(address: uint16): uint8 =
     result = Memory[address]
+    if address == 0xFFF1:
+        result = uint8(ProgramCounter.bitsliced(0..7))
+    if address == 0xFFF2:
+        result = uint8(ProgramCounter.bitsliced(8..15))
 
 proc write(address: uint16, data: uint8) =
     if address.getMemoryRegion() == "RAM":
@@ -81,12 +115,13 @@ else:
 
 
 
-
-
-
+echo "initializing execution."
+echo ""
 
 var actingRegisterOne: uint8
 var actingRegisterTwo: uint8
+
+let debug = false
 
 while running:
 
@@ -96,18 +131,20 @@ while running:
 
     for i in 0..<getInstructionLength(CurrentInstructionBuffer[0]):
         CurrentInstructionBuffer[i] = read(ProgramCounter+uint16(i))    # load instruction buffer with current  instruction
+    
+    ProgramCounter += uint16(getInstructionLength(CurrentInstructionBuffer[0]))    # increment program counter to location of next instruction
 
 # ---------------------------------- execute --------------------------------- #
-    echo "=========================="
-    echo "address: ", ProgramCounter
+    if debug: echo "=========================="
+    if debug: echo "address: ", ProgramCounter - uint16(getInstructionLength(CurrentInstructionBuffer[0]))
 
     case CurrentInstructionBuffer[0].bitsliced(3..7)
     of 0b00000:
-        echo "NOP"
+        if debug: echo "NOP"
         discard
 
     of 0b00010:
-        echo "SET REGISTER"
+        if debug: echo "SET REGISTER"
 
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
         actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
@@ -115,91 +152,232 @@ while running:
         Registers[actingRegisterOne] = Registers[actingRegisterTwo]
 
     of 0b00011:
-        echo "SET IMMEDIATE"
+        if debug: echo "SET IMMEDIATE"
 
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
 
         Registers[actingRegisterOne] = CurrentInstructionBuffer[1]
 
     of 0b00100:
-        echo "LW REGISTER"
+        if debug: echo "LW REGISTER"
 
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
 
         Registers[actingRegisterOne] = read(getHL())
 
     of 0b00101:
-        echo "LW IMMEDIATE"
+        if debug: echo "LW IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        Registers[actingRegisterOne] = read(binConcat(CurrentInstructionBuffer[1], CurrentInstructionBuffer[2]))
+
 
     of 0b00110:
-        echo "SW REGISTER"
+        if debug: echo "SW REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        write(getHL(), Registers[actingRegisterOne])
 
     of 0b00111:
-        echo "SW IMMEDIATE"
+        if debug: echo "SW IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        write(binConcat(CurrentInstructionBuffer[1], CurrentInstructionBuffer[2]), Registers[actingRegisterOne])
 
     of 0b01000:
-        echo "ADD REGISTER"
+        if debug: echo "ADD REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        let sum = Registers[actingRegisterOne] + Registers[actingRegisterTwo]
+        Registers[actingRegisterOne] = sum
+
+        # detect CARRY and set flag
+        if  (sum < Registers[actingRegisterOne]) or (sum < Registers[actingRegisterTwo]):
+            setFlag("CARRY")
 
     of 0b01001:
-        echo "ADD IMMEDIATE"
+        if debug: echo "ADD IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        let sum = Registers[actingRegisterOne] + CurrentInstructionBuffer[1]
+        Registers[actingRegisterOne] = sum
+
+        # detect CARRY and set flag
+        if  (sum < Registers[actingRegisterOne]) or (sum < CurrentInstructionBuffer[1]):
+            setFlag("CARRY")
 
     of 0b01010:
-        echo "ADC REGISTER"
+        if debug: echo "ADC REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        let sum = Registers[actingRegisterOne] + Registers[actingRegisterTwo] + uint8(getFlag("CARRY"))
+        Registers[actingRegisterOne] = sum
+
+        # detect CARRY and set flag
+        if  (sum < Registers[actingRegisterOne]) or (sum < Registers[actingRegisterTwo]):
+            setFlag("CARRY")
 
     of 0b01011:
-        echo "ADC IMMEDIATE"
+        if debug: echo "ADC IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        let sum = Registers[actingRegisterOne] + CurrentInstructionBuffer[1] + uint8(getFlag("CARRY"))
+        Registers[actingRegisterOne] = sum
+
+        # detect CARRY and set flag
+        if  (sum < Registers[actingRegisterOne]) or (sum < CurrentInstructionBuffer[1]):
+            setFlag("CARRY")
     
     of 0b01100:
-        echo "SUB REGISTER"
+        if debug: echo "SUB REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        let diff = Registers[actingRegisterOne] - Registers[actingRegisterTwo]
+        Registers[actingRegisterOne] = diff
+
+        if  (diff > Registers[actingRegisterOne]) or (diff > Registers[actingRegisterTwo]):
+            setFlag("BORROW")
 
     of 0b01101:
-        echo "SUB IMMEDIATE"
+        if debug: echo "SUB IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        let diff = Registers[actingRegisterOne] - CurrentInstructionBuffer[1]
+        Registers[actingRegisterOne] = diff
+
+        if  (diff > Registers[actingRegisterOne]) or (diff > CurrentInstructionBuffer[1]):
+            setFlag("BORROW")
 
     of 0b01110:
-        echo "SBB REGISTER"
+        if debug: echo "SBB REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        let diff = Registers[actingRegisterOne] - Registers[actingRegisterTwo] - uint8(getFlag("BORROW"))
+        Registers[actingRegisterOne] = diff
+
+        if  (diff > Registers[actingRegisterOne]) or (diff > Registers[actingRegisterTwo]):
+            setFlag("BORROW")
 
     of 0b01111:
-        echo "SBB IMMEDIATE"
+        if debug: echo "SBB IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        let diff = Registers[actingRegisterOne] - CurrentInstructionBuffer[1] - uint8(getFlag("BORROW"))
+        Registers[actingRegisterOne] = diff
+
+        if  (diff > Registers[actingRegisterOne]) or (diff > CurrentInstructionBuffer[1]):
+            setFlag("BORROW")
 
     of 0b10000:
-        echo "JMP REGISTER"
+        if debug: echo "JMP REGISTER"
+
+        ProgramCounter = getHL()
 
     of 0b10001:
-        echo "JMP IMMEDIATE"
+        if debug: echo "JMP IMMEDIATE"
+
+        ProgramCounter = binConcat(CurrentInstructionBuffer[1], CurrentInstructionBuffer[2])
 
     of 0b10010:
-        echo "JNZ REGISTER"
+        if debug: echo "JNZ REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        if Registers[actingRegisterOne] != 0:
+            ProgramCounter = getHL()
 
     of 0b10011:
-        echo "JNZ IMMEDIATE"
+        if debug: echo "JNZ IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        if Registers[actingRegisterOne] != 0:
+            ProgramCounter = binConcat(CurrentInstructionBuffer[1], CurrentInstructionBuffer[2])
 
     of 0b10100:
-        echo "AND REGISTER"
+        if debug: echo "AND REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        Registers[actingRegisterOne] = bitand(Registers[actingRegisterOne], Registers[actingRegisterTwo])
 
     of 0b10101:
-        echo "AND IMMEDIATE"
+        if debug: echo "AND IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        
+        Registers[actingRegisterOne] = bitand(Registers[actingRegisterOne], CurrentInstructionBuffer[1])
 
     of 0b10110:
-        echo "OR REGISTER"
+        if debug: echo "OR REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        Registers[actingRegisterOne] = bitor(Registers[actingRegisterOne], Registers[actingRegisterTwo])
 
     of 0b10111:
-        echo "OR IMMEDIATE"
+        if debug: echo "OR IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        
+        Registers[actingRegisterOne] = bitor(Registers[actingRegisterOne], CurrentInstructionBuffer[1])
 
     of 0b11000:
-        echo "NOT REGISTER"
+        if debug: echo "NOT REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        Registers[actingRegisterOne] = bitnot(Registers[actingRegisterOne])
 
     of 0b11010:
-        echo "CMP REGISTER"
+        if debug: echo "CMP REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        if Registers[actingRegisterOne] == Registers[actingRegisterTwo]:
+            setFlag("EQUAL")
+        
+        if Registers[actingRegisterOne] < Registers[actingRegisterTwo]:
+            setFlag("LESS")
+        
+        if Registers[actingRegisterOne] == 0:
+            setFlag("ZERO")
 
     of 0b11011:
-        echo "CMP IMMEDIATE"
+        if debug: echo "CMP IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        if Registers[actingRegisterOne] == CurrentInstructionBuffer[1]:
+            setFlag("EQUAL")
+        
+        if Registers[actingRegisterOne] < CurrentInstructionBuffer[1]:
+            setFlag("LESS")
+        
+        if Registers[actingRegisterOne] == 0:
+            setFlag("ZERO")
 
     of 0b11111:
-        echo "HALT"
+        if debug: echo "HALT"
         exit()
     else:
-        echo "INVALID INSTRUCTION, EXITING"
+        if debug: echo "INVALID INSTRUCTION, EXITING"
         exit()
-    
-
-    ProgramCounter += uint16(getInstructionLength(CurrentInstructionBuffer[0]))    # increment program counter to location of next instruction
