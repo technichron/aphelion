@@ -2,11 +2,7 @@
 @define out, 0xFFFF
 @define address, 0x9001
 main:
+    set a, 0d104
     loop:
-        add a, 0d03
-        str a, address
-        str a, out
-        add a, 0d03
-        str a, address
-        str a, out
+        sw a, out
         jmp loop

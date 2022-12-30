@@ -103,6 +103,12 @@ proc levelOneFlatten(f: string): seq[string] =
 
     if hasMainLabel:
         file = concat(@["jmp main"], file)
+    
+    if file[file.high()] != "halt" and file[file.high()] != "HALT":
+        file = concat(file, @["halt"])
+
+
+
 
     result = file
 
@@ -132,7 +138,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
         
-        of "ldr", "LDR":                                                                        # ldr
+        of "lw", "LW":                                                                        # lw
             result.add("0010")
 
             case getDataType(line.split()[2])
@@ -146,7 +152,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("0")
                 result.add(getRegisterCode(line.split()[1]))
         
-        of "str", "STR":                                                                        # str
+        of "sw", "SW":                                                                        # sw
             result.add("0011")
 
             case getDataType(line.split()[2])
@@ -297,6 +303,9 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(line.split()[1])
+        
+        of "halt", "HALT":
+            result.add("11111111")
 
         else:
             result.add(line)
