@@ -5,6 +5,9 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
+const asmfile = "assembler/sample2.asm"
+
+
 # proc seqStringToString(s: seq[string]): string =
 #     for i in s.low()..s.high():
 #         result.add(s[i])
@@ -367,7 +370,7 @@ proc txtToBin(inText: string): string =
 
 proc main() = 
 
-    let raw = readFile("assembler/sample.asm")
+    let raw = readFile(asmfile)
 
     let flattened = levelOneFlatten(raw)
 

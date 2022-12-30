@@ -5,13 +5,13 @@
 import std/strutils, std/sequtils, std/bitops
 
 # let raw = readFile("assembler/output.bin")
-var x = 0b00100111
+var x: uint8 = 0b01000000
+var y: uint8 = 0b11110111
+var z: uint16 = 0b0100000011110111
 
 # stdout.write(char(uint8(72)))
 # stdout.write(char(uint8(72)))
 
-echo toBin(x, 8)
-echo toBin(x.bitsliced(3..7), 5)
 
-for x in 0..<5:
-    echo x
+echo x*256 + y
+echo z

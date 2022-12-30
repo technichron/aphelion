@@ -10,16 +10,21 @@ var Memory: array[65536, uint8]
 var ProgramCounter:uint16 = 0
 var CurrentInstructionBuffer: array[3, uint8]
 
-var RegisterA: uint8    # general
-var RegisterB: uint8    # general
-var RegisterC: uint8    # general
-var RegisterD: uint8    # general
-var RegisterE: uint8    # general
-var RegisterL: uint8    # general / low index register
-var RegisterH: uint8    # general / high index register
-var RegisterF: uint8    # flags: 000, carry, borrow, equal, less, zero
+var Registers: array[8, uint8]
+# A - 0b000 - general
+# B - 0b001 - general
+# C - 0b010 - general
+# D - 0b011 - general
+# E - 0b100 - general
+# L - 0b101 - general / low index register
+# H - 0b110 - general / high index register
+# F - 0b111 - flags: 000, carry, borrow, equal, less, zero
 
 var running = true
+
+proc binConcat(a,b: uint8): uint16 = uint16(a*256 + b)
+
+proc getHL(): uint16 = binConcat(Registers[0b110], Registers[0b101])
 
 proc getMemoryRegion(address: uint16): string =
     if address == 0xFFFF:
@@ -62,9 +67,6 @@ proc write(address: uint16, data: uint8) =
 proc exit() =
     running = false
 
-
-
-
 # -------------------------- loading rom into memory ------------------------- #
 
 let rom = readFile("assembler/output.bin")
@@ -78,6 +80,14 @@ else:
     running = false
 
 
+
+
+
+
+
+var actingRegisterOne: uint8
+var actingRegisterTwo: uint8
+
 while running:
 
 # ----------------------------------- fetch ---------------------------------- #
@@ -86,66 +96,110 @@ while running:
 
     for i in 0..<getInstructionLength(CurrentInstructionBuffer[0]):
         CurrentInstructionBuffer[i] = read(ProgramCounter+uint16(i))    # load instruction buffer with current  instruction
-    
-    ProgramCounter += uint16(getInstructionLength(CurrentInstructionBuffer[0]))    # increment program counter to location of next instruction
 
 # ---------------------------------- execute --------------------------------- #
+    echo "=========================="
+    echo "address: ", ProgramCounter
+
     case CurrentInstructionBuffer[0].bitsliced(3..7)
     of 0b00000:
         echo "NOP"
+        discard
+
     of 0b00010:
-        echo "NOP"
+        echo "SET REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+        actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
+
+        Registers[actingRegisterOne] = Registers[actingRegisterTwo]
+
     of 0b00011:
-        echo "NOP"
+        echo "SET IMMEDIATE"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        Registers[actingRegisterOne] = CurrentInstructionBuffer[1]
+
     of 0b00100:
-        echo "NOP"
+        echo "LW REGISTER"
+
+        actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
+
+        Registers[actingRegisterOne] = read(getHL())
+
     of 0b00101:
-        echo "NOP"
+        echo "LW IMMEDIATE"
+
     of 0b00110:
-        echo "NOP"
+        echo "SW REGISTER"
+
     of 0b00111:
-        echo "NOP"
+        echo "SW IMMEDIATE"
+
     of 0b01000:
-        echo "NOP"
+        echo "ADD REGISTER"
+
     of 0b01001:
-        echo "NOP"
+        echo "ADD IMMEDIATE"
+
     of 0b01010:
-        echo "NOP"
+        echo "ADC REGISTER"
+
     of 0b01011:
-        echo "NOP"
+        echo "ADC IMMEDIATE"
+    
+    of 0b01100:
+        echo "SUB REGISTER"
+
+    of 0b01101:
+        echo "SUB IMMEDIATE"
+
     of 0b01110:
-        echo "NOP"
+        echo "SBB REGISTER"
+
     of 0b01111:
-        echo "NOP"
+        echo "SBB IMMEDIATE"
+
     of 0b10000:
-        echo "NOP"
+        echo "JMP REGISTER"
+
     of 0b10001:
-        echo "NOP"
+        echo "JMP IMMEDIATE"
+
     of 0b10010:
-        echo "NOP"
+        echo "JNZ REGISTER"
+
     of 0b10011:
-        echo "NOP"
+        echo "JNZ IMMEDIATE"
+
     of 0b10100:
-        echo "NOP"
+        echo "AND REGISTER"
+
     of 0b10101:
-        echo "NOP"
+        echo "AND IMMEDIATE"
+
     of 0b10110:
-        echo "NOP"
+        echo "OR REGISTER"
+
     of 0b10111:
-        echo "NOP"
+        echo "OR IMMEDIATE"
+
     of 0b11000:
-        echo "NOP"
+        echo "NOT REGISTER"
+
     of 0b11010:
-        echo "NOP"
+        echo "CMP REGISTER"
+
     of 0b11011:
-        echo "NOP"
+        echo "CMP IMMEDIATE"
+
     of 0b11111:
-        echo "NOP"
+        echo "HALT"
+        exit()
     else:
         echo "INVALID INSTRUCTION, EXITING"
         exit()
+    
 
-
-
-
-    exit()
+    ProgramCounter += uint16(getInstructionLength(CurrentInstructionBuffer[0]))    # increment program counter to location of next instruction
