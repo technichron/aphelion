@@ -16,8 +16,8 @@ var Registers: array[8, uint8]
 # C - 0b010 - general
 # D - 0b011 - general
 # E - 0b100 - general
-# L - 0b101 - general / low index register
-# H - 0b110 - general / high index register
+# L - 0b101 - general / 16bit low register
+# H - 0b110 - general / 16bit high register
 # F - 0b111 - flags: 000CBELZ - CARRY, BORROW, EQUAL, LESS, ZERO
 
 var running = true
@@ -103,7 +103,7 @@ proc exit() =
 
 # -------------------------- loading rom into memory ------------------------- #
 
-let rom = readFile("assembler/output.bin")
+let rom = readFile("T:/vscode/aphelion/assembler/output.bin")
 if rom.len() <= 0x9000:
     echo "rom length: ", rom.len(), " bytes"
     echo "loading rom..."
