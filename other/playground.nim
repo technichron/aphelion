@@ -12,3 +12,6 @@ var x = 0b00100111
 
 echo toBin(x, 8)
 echo toBin(x.bitsliced(3..7), 5)
+
+for x in 0..<5:
+    echo x
