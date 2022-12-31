@@ -7,10 +7,9 @@
 main:
     set a, asciistart
     set b, asciiend
-    subtract b, asciistart
+    sub b, asciistart
     loop:
-
-        str a, out
+        save a, out
         add a, 0d01 
         sub b, 0d01 
         jnz b, loop

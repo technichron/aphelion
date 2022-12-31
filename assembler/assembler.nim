@@ -5,19 +5,18 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-const asmfile = "code/sample.asm"
+let asmfile = "code/sample.asm"
 
-
-# proc seqStringToString(s: seq[string]): string =
-#     for i in s.low()..s.high():
-#         result.add(s[i])
-#         result.add("\n")
+proc seqStringToString(s: seq[string]): string =
+    for i in s.low()..s.high():
+        result.add(s[i])
+        result.add("\n")
 
 proc getDataType(value: string): string =
     case value[0]
     of '0': #number
         result = $value[1] # x - hex, b - binary, d - decimal, o - octal
-    of 'a','A','b','B','c','C','d','D','z','Z','l','L','h','H','f','F':
+    of 'a','A','b','B','c','C','d','D','e','E','l','L','h','H','f','F':
         result = "register"
     else:
         result = "error"
@@ -141,7 +140,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
         
-        of "ld", "LD", "load", "LOAD":                                                                        # load
+        of "load", "LOAD":                                                                        # load
             result.add("0010")
 
             case getDataType(line.split()[2])
@@ -155,7 +154,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("0")
                 result.add(getRegisterCode(line.split()[1]))
         
-        of "str", "STR","store", "STORE":                                                                        # save
+        of "save", "SAVE":                                                                        # save
             result.add("0011")
 
             case getDataType(line.split()[2])
@@ -185,7 +184,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
             
-        of "adc", "ADC", "addwithcarry", "ADDWITHCARRY":                                                                        # adc
+        of "adc", "ADC":                                                                        # adc
             result.add("0101")
 
             case getDataType(line.split()[2])
@@ -201,7 +200,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
 
-        of "sub", "SUB", "subtract", "SUBTRACT":                                                                        # sub
+        of "sub", "SUB":                                                                        # sub
             result.add("0110")
 
             case getDataType(line.split()[2])
@@ -217,7 +216,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
 
-        of "sbb", "SBB", "subtractwithcarry", "SUBTRACTWITHCARRY":                                                                        # sbb
+        of "sbb", "SBB":                                                                        # sbb
             result.add("0111")
 
             case getDataType(line.split()[2])
@@ -269,7 +268,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("11000")
             result.add(getRegisterCode(line.split()[1]))
 
-        of "cmp", "CMP", "compare", "COMPARE":                                                                        # cmp
+        of "cmp", "CMP":                                                                        # cmp
             result.add("1101")
 
             case getDataType(line.split()[2])
@@ -285,7 +284,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
 
-        of "jmp", "JMP", "jump", "JUMP":                                                                        # jmp
+        of "jmp", "JMP":                                                                        # jmp
             result.add("1000")
 
             case line.split()[1]
@@ -295,7 +294,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("1000 ")
                 result.add(line.split()[1])
 
-        of "jnz", "JNZ", "jumpnotzero", "JUMPNOTZERO":                                                                        # jnz
+        of "jnz", "JNZ":                                                                        # jnz
             result.add("1001")
 
             case line.split()[2]
@@ -378,8 +377,8 @@ proc main() =
     let binaryTextFile = levelOneBinaryConversion(flattened)
     let binaryFile = txtToBin(binaryTextFile)
 
-    #writeFile("code/flattened.txt", seqStringToString(flattened))
-    #writeFile("code/output.txt", binaryTextFile)
+    #writeFile("flattened.txt", seqStringToString(flattened))
+    #writeFile("assembler/output.txt", binaryTextFile)
     writeFile("code/output.bin", binaryFile)
 
     echo "done!"

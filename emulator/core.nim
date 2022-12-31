@@ -1,7 +1,7 @@
 # APHELION EMULATOR 1.0
 # BY TECHNICHRON
 
-import std/bitops
+import std/bitops, std/os
 
 # ----------------------------------- setup ---------------------------------- #
 
@@ -41,7 +41,7 @@ proc getMemoryRegion(address: uint16): string =
 proc getInstructionLength(instruction: uint8): int =
     case instruction.bitsliced(3..7)    # instruction.bitsliced(3..7) = opcode
 
-    #NOP, LW R, SW R, JMP R, JNZ R, NOT, HALT
+    #NOP, LOAD R, SAVE R, JMP R, JNZ R, NOT, HALT
     of 0b00000, 0b00100, 0b00110, 0b10000, 0b10010, 0b11000, 0b11111:
         result = 1
     
@@ -49,7 +49,7 @@ proc getInstructionLength(instruction: uint8): int =
     of 0b00010, 0b00011, 0b01000, 0b01001, 0b01010, 0b01011, 0b01100, 0b01101, 0b01110, 0b01111, 0b10100, 0b10101, 0b10110, 0b10111, 0b11010, 0b11011:
         result = 2
     
-    #LW I, SW I, JMP I, JNZ I
+    #LOAD I, SAVE I, JMP I, JNZ I
     of 0b00101, 0b00111, 0b10001, 0b10011:
         result = 3
     else:
@@ -101,9 +101,17 @@ proc write(address: uint16, data: uint8) =
 proc exit() =
     running = false
 
+let debug = false
+let clock: float = 1000 #hz
+
+
+
+
+let sleepInterval = int((1/clock)*1000)
+
 # -------------------------- loading rom into memory ------------------------- #
 
-let rom = readFile("T:/vscode/aphelion/assembler/output.bin")
+let rom = readFile("code/output.bin")
 if rom.len() <= 0x9000:
     echo "rom length: ", rom.len(), " bytes"
     echo "loading rom..."
@@ -121,9 +129,8 @@ echo ""
 var actingRegisterOne: uint8
 var actingRegisterTwo: uint8
 
-let debug = false
 
-while running:
+proc Cycle() =
 
 # ----------------------------------- fetch ---------------------------------- #
 
@@ -159,14 +166,14 @@ while running:
         Registers[actingRegisterOne] = CurrentInstructionBuffer[1]
 
     of 0b00100:
-        if debug: echo "LW REGISTER"
+        if debug: echo "LOAD REGISTER"
 
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
 
         Registers[actingRegisterOne] = read(getHL())
 
     of 0b00101:
-        if debug: echo "LW IMMEDIATE"
+        if debug: echo "LOAD IMMEDIATE"
 
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
 
@@ -174,14 +181,14 @@ while running:
 
 
     of 0b00110:
-        if debug: echo "SW REGISTER"
+        if debug: echo "SAVE REGISTER"
 
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
 
         write(getHL(), Registers[actingRegisterOne])
 
     of 0b00111:
-        if debug: echo "SW IMMEDIATE"
+        if debug: echo "SAVE IMMEDIATE"
 
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
 
@@ -381,3 +388,7 @@ while running:
     else:
         if debug: echo "INVALID INSTRUCTION, EXITING"
         exit()
+
+while running:
+    Cycle()
+    sleep(sleepInterval)
