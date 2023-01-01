@@ -1,6 +1,6 @@
 ​
 
-![aphelion](https://user-images.githubusercontent.com/73349893/210174772-45b9b0b6-7bd4-4cec-8f4d-b15da5b92d47.png)
+![aphelion](images/aphelion.png)
 # Aphelion
 
-Aphelion is a custom 8-bit system with a minimal ISA.
+Aphelion is a custom 8-bit system with a minimal ISA. It's still in development, so don't mind the mess.
