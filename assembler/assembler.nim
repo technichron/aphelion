@@ -5,8 +5,7 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-const asmfile = "assembler/sample.asm"
-
+let asmfile = "code/helloworld.asm"
 
 proc seqStringToString(s: seq[string]): string =
     for i in s.low()..s.high():
@@ -17,7 +16,7 @@ proc getDataType(value: string): string =
     case value[0]
     of '0': #number
         result = $value[1] # x - hex, b - binary, d - decimal, o - octal
-    of 'a','A','b','B','c','C','d','D','z','Z','l','L','h','H','f','F':
+    of 'a','A','b','B','c','C','d','D','e','E','l','L','h','H','f','F':
         result = "register"
     else:
         result = "error"
@@ -141,7 +140,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" 00000")
                 result.add(getRegisterCode(line.split()[2]))
         
-        of "lw", "LW":                                                                        # lw
+        of "load", "LOAD":                                                                        # load
             result.add("0010")
 
             case getDataType(line.split()[2])
@@ -155,7 +154,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add("0")
                 result.add(getRegisterCode(line.split()[1]))
         
-        of "sw", "SW":                                                                        # sw
+        of "save", "SAVE":                                                                        # save
             result.add("0011")
 
             case getDataType(line.split()[2])
@@ -379,8 +378,8 @@ proc main() =
     let binaryFile = txtToBin(binaryTextFile)
 
     #writeFile("flattened.txt", seqStringToString(flattened))
-    writeFile("assembler/output.txt", binaryTextFile)
-    writeFile("assembler/output.bin", binaryFile)
+    #writeFile("assembler/output.txt", binaryTextFile)
+    writeFile("code/output.bin", binaryFile)
 
     echo "done!"
     
