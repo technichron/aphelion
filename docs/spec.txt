@@ -44,10 +44,10 @@
     LOAD       │ reg, (HL/imm16)                     │ load reg with value at address (HL/imm16)
     SAVE       │ reg, (HL/imm16)                     │ store value in reg at address (HL/imm16)
     DSAVE  *   │ imm8, (HL/imm16)                    │ store imm8 at address (HL/imm16)
-    ADD†       │ reg1, (reg2/imm8)                   │ reg1 = reg1 + (reg2/imm8)
-    ADC†       │ reg1, (reg2/imm8)                   │ reg1 = reg1 + (reg2/imm8) + carry
-    SUB†       │ reg1, (reg2/imm8)                   │ reg1 = reg1 - (reg2/imm8)
-    SBB†       │ reg1, (reg2/imm8)                   │ reg1 = reg1 - (reg2/imm8) - borrow
+    ADD      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 + (reg2/imm8)
+    ADC      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 + (reg2/imm8) + carry
+    SUB      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 - (reg2/imm8)
+    SBB      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 - (reg2/imm8) - borrow
     JMP        │ (HL/label/imm16)                    │ PC = (HL/imm16)
     JNZ      † │ reg, (HL/label/imm16)               │ PC = (HL/imm16) if reg != 0
     JEZ    * † │ reg, (HL/label/imm16)               │ PC = (HL/imm16) if reg == 0

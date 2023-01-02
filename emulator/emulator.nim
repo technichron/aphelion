@@ -121,7 +121,7 @@ proc exit() =
     running = false
 
 debug = false
-clock = 600 #hz - at >1000, runs at full speed
+clock = 1001 #hz - at >1000, runs at full speed
 
 
 
@@ -462,6 +462,8 @@ proc Cycle() =
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
         actingRegisterTwo = CurrentInstructionBuffer[1].bitsliced(0..2)
 
+        Registers[0b111] = 0x00
+
         if Registers[actingRegisterOne] == Registers[actingRegisterTwo]:
             setFlag("EQUAL")
         
@@ -480,6 +482,8 @@ proc Cycle() =
     of 0b11011:
         actingRegisterOne = CurrentInstructionBuffer[0].bitsliced(0..2)
 
+        Registers[0b111] = 0x00
+
         if Registers[actingRegisterOne] == CurrentInstructionBuffer[1]:
             setFlag("EQUAL")
         
@@ -488,7 +492,6 @@ proc Cycle() =
         
         if Registers[actingRegisterOne] == 0:
             setFlag("ZERO")
-        
         
         if debug:
             debugmessage.add("CMP ")

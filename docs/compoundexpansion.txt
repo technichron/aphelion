@@ -50,7 +50,7 @@ jle (reg1), (reg2/imm8), (label/imm16) =
     set e, f 
     and e, 0b00000110
     jnz e, (HL/label/imm16)
-    
+
 jge (reg1), (reg2/imm8), (label/imm16) =
 
     set e, (reg2/imm8)

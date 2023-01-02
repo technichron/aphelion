@@ -5,7 +5,7 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-let asmfile = "code/templatetest.asm"
+let asmfile = "code/sample.asm"
 
 proc seqStringToString(s: seq[string]): string =
     for i in s.low()..s.high():

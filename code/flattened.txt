@@ -1,14 +1,11 @@
 jmp main
 main:
-set e 0x50
-cmp e a
+set a 0x41
+loop:
+save a 0xFFFF
+add a 0d01
+cmp a 0x5A
 set e f
 and e 0b00000110
-jnz e display
-add a 0x01
-jmp main
-display:
-save a 0xFFFF
-set e 0x5F
-save e 0xFFFF
+jnz e loop
 hcf
