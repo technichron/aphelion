@@ -1,9 +1,10 @@
 general:
-	get input working - relies on emulator window ?
+	get input working - relies on emulator window
 	? central aphelion program that can call assembler and emulator
 assembler:
+	add compound instruction interpretation
 	add char interpretation
 	add command line arguments so i dont have to edit the damn file every time
 emulator:
-	replace command line out with window out
+	replace command line out with window interface
 	command line args for this too

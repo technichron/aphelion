@@ -1,0 +1,60 @@
+dsave (imm8), (HL/imm16) =
+
+    set e, (imm8)
+    save e, (HL/imm16)
+
+
+jez (reg), (HL/label/imm16)
+
+    cmp (reg), 0
+    set e, f
+    and e, 0b00000001
+    jnz e, (HL/label/imm16)
+
+
+jeq (reg1), (reg2/imm8), (label/imm16) =
+
+    cmp (reg1), (reg2/imm8)
+    set e, f 
+    and e, 0b00000100
+    jnz e, (HL/label/imm16)
+
+
+jne (reg1), (reg2/imm8), (label/imm16) =
+
+    cmp (reg1), (reg2/imm8)
+    set e, f 
+    not e
+    and e, 0b00000100
+    jnz e, (HL/label/imm16)
+
+
+jlt (reg1), (reg2/imm8), (label/imm16) =
+
+    cmp (reg1), (reg2/imm8)
+    set e, f 
+    and e, 0b00000010
+    jnz e, (HL/label/imm16)
+
+jgt (reg1), (reg2/imm8), (label/imm16) =
+
+    set e, (reg2/imm8)
+    cmp e, (reg1)
+    set e, f 
+    and e, 0b00000010
+    jnz e, (HL/label/imm16)
+
+jle (reg1), (reg2/imm8), (label/imm16) =
+
+    cmp (reg1), (reg2/imm8)
+    set e, f 
+    and e, 0b00000110
+    jnz e, (HL/label/imm16)
+    
+jge (reg1), (reg2/imm8), (label/imm16) =
+
+    set e, (reg2/imm8)
+    cmp e, (reg1)
+    set e, f 
+    and e, 0b00000110
+    jnz e, (HL/label/imm16)

@@ -5,7 +5,7 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-let asmfile = "code/helloworld.asm"
+let asmfile = "code/templatetest.asm"
 
 proc seqStringToString(s: seq[string]): string =
     for i in s.low()..s.high():
@@ -78,7 +78,7 @@ proc levelOneFlatten(f: string): seq[string] =
     for i in file.low()..file.high():                               # strip leading and trailing whitespace again
         file[i] = strip(file[i])
     
-    echo "cleansed..."
+    #echo "cleansed..."
     
     var defineList: seq[array[2, string]]                       # sequence of definition statements to replace
     for i in file.low()..file.high():                               # in the format of ["name","value"]
@@ -91,7 +91,7 @@ proc levelOneFlatten(f: string): seq[string] =
         for definition in defineList:
             file[i] = file[i].replaceWord(definition[0], definition[1])
     
-    echo "definitions resolved..."
+    #echo "definitions resolved..."
 
     for i in file.low()..file.high():
         file[i] = file[i].replace(",")
@@ -106,13 +106,83 @@ proc levelOneFlatten(f: string): seq[string] =
     if hasMainLabel:
         file = concat(@["jmp main"], file)
     
-    if file[file.high()] != "halt" and file[file.high()] != "HALT":
-        file = concat(file, @["halt"])
+    if file[file.high()] != "hcf" and file[file.high()] != "HCF":
+        file = concat(file, @["hcf"])
 
 
 
 
     result = file
+
+proc compoundTemplateExpansion(f: seq[string]): seq[string] =
+    
+    var newfile = f
+
+    for line in f.low()..f.high():
+        let instruction = newfile[line].split()
+
+        if normalize(instruction[0]) == "dsave":
+
+            newfile[line] =                 "set e " & instruction[1] & "\n"
+            newfile[line] = newfile[line] & "save e " & instruction[2]
+        
+        if normalize(instruction[0]) == "jez":
+
+            newfile[line] =                 "cmp " & instruction[1] & " 0\n"
+            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] = newfile[line] & "and e 0b00000001\n"
+            newfile[line] = newfile[line] & "jnz e " & instruction[2]
+        
+        if normalize(instruction[0]) == "jeq":
+            
+            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] = newfile[line] & "and e 0b00000100\n"
+            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+
+        if normalize(instruction[0]) == "jne":
+
+            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] = newfile[line] & "not e\n"
+            newfile[line] = newfile[line] & "and e 0b00000100\n"
+            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+        
+        if normalize(instruction[0]) == "jlt":
+
+            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] = newfile[line] & "and e 0b00000010\n"
+            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+        
+        if normalize(instruction[0]) == "jgt":
+
+            newfile[line] =                 "set e, " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "cmp e " & instruction[1] & "\n"
+            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] = newfile[line] & "and e 0b00000010\n"
+            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+        
+        if normalize(instruction[0]) == "jle":
+
+            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] = newfile[line] & "and e 0b00000110\n"
+            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+
+        if normalize(instruction[0]) == "jge":
+
+            newfile[line] =                 "set e " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "cmp e " & instruction[1] & "\n"
+            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] = newfile[line] & "and e 0b00000110\n"
+            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+    
+    result = seqStringToString(newfile).splitLines()
+    for i in result.low()..result.high():
+        result[i] = strip(result[i])
+    
+    result = result.filterIt(it.len != 0)
 
 proc levelOneBinaryConversion(input: seq[string]): string =
 
@@ -307,7 +377,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
                 result.add(" ")
                 result.add(line.split()[2])
         
-        of "halt", "HALT":
+        of "hcf", "HCF", "halt", "HALT":
             result.add("11111111")
 
         else:
@@ -315,7 +385,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
     
     result.delete(0..0)
 
-    echo "instructions converted..."
+    #echo "instructions converted..."
 
     # ----------------------- jmp / jnz reference processor ---------------------- #
 
@@ -353,7 +423,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
         byteList.delete(byteNumber)
 
     
-    echo "jumps resolved..."
+    #echo "jumps resolved..."
     
     result = ""
     for b in byteList:
@@ -372,15 +442,15 @@ proc main() =
 
     let raw = readFile(asmfile)
 
-    let flattened = levelOneFlatten(raw)
+    let flattened = compoundTemplateExpansion(levelOneFlatten(raw))
 
     let binaryTextFile = levelOneBinaryConversion(flattened)
     let binaryFile = txtToBin(binaryTextFile)
 
-    #writeFile("flattened.txt", seqStringToString(flattened))
+    writeFile("code/flattened.txt", seqStringToString(flattened))
     #writeFile("assembler/output.txt", binaryTextFile)
     writeFile("code/output.bin", binaryFile)
 
-    echo "done!"
+    #echo "done!"
     
 main()

@@ -103,9 +103,9 @@ proc getFlag(name: string):bool =
 
 proc read(address: uint16): uint8 =
     result = Memory[address]
-    if address == 0xFFF1:
-        result = uint8(ProgramCounter.bitsliced(0..7))
     if address == 0xFFF2:
+        result = uint8(ProgramCounter.bitsliced(0..7))
+    if address == 0xFFF1:
         result = uint8(ProgramCounter.bitsliced(8..15))
 
 proc write(address: uint16, data: uint8) =
@@ -248,7 +248,7 @@ proc Cycle() =
         if  (sum < Registers[actingRegisterOne]) or (sum < Registers[actingRegisterTwo]):
             setFlag("CARRY")
         
-        if debug:
+        if debug: 
             debugmessage.add("ADD ")
             debugmessage.add(getRegisterName(actingRegisterOne))
             debugmessage.add(" ")
@@ -489,6 +489,7 @@ proc Cycle() =
         if Registers[actingRegisterOne] == 0:
             setFlag("ZERO")
         
+        
         if debug:
             debugmessage.add("CMP ")
             debugmessage.add(getRegisterName(actingRegisterOne))
@@ -496,7 +497,7 @@ proc Cycle() =
             debugmessage.add(toHex(CurrentInstructionBuffer[1]))
     
     of 0b11111:
-        if debug: debugmessage.add("HALT")
+        if debug: debugmessage.add("HCF")
         exit()
     else:
         if debug: debugmessage.add("INVALID INSTRUCTION, EXITING")

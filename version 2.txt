@@ -1,0 +1,3 @@
+single "jump if flag" instruction
+combine load/save/dsave into mov
+rework the mess of string manipulation that is the assembler

@@ -1,0 +1,14 @@
+jmp main
+main:
+set e 0x50
+cmp e a
+set e f
+and e 0b00000110
+jnz e display
+add a 0x01
+jmp main
+display:
+save a 0xFFFF
+set e 0x5F
+save e 0xFFFF
+hcf
