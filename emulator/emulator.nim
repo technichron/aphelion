@@ -25,6 +25,7 @@ var running = true
 var debug: bool
 var debugMessage: string
 var clock: float
+var loadRAM: bool
 
 proc getRegisterName(code: uint8): string =
     case code
@@ -122,13 +123,13 @@ proc exit() =
 
 debug = false
 clock = 1001 #hz - at >1000, runs at full speed
-
+loadRAM = false
 
 
 
 let sleepInterval = int((1/clock)*1000)
 
-# -------------------------- loading rom into memory ------------------------- #
+# ------------------------------ loading memory ------------------------------ #
 
 let rom = readFile("code/output.bin")
 if rom.len() <= 0x9000:
@@ -139,6 +140,19 @@ if rom.len() <= 0x9000:
 else:
     echo "error: rom is length ", rom.len(), "b, expected <= ", 0x9000, "b"
     running = false
+
+if loadRAM:
+    let ram = readFile("code/ram.bin")
+    if ram.len() <= 0x6FF1:
+        echo "ram length: ", rom.len(), " bytes"
+        echo "loading ram..."
+        for index in rom.low()..rom.high():
+            Memory[0x9000+index] = uint8(rom[index])
+    else:
+        echo "error: rom is length ", rom.len(), "b, expected <= ", 0x6FF1, "b"
+        running = false
+
+
 
 
 
