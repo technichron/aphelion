@@ -1,11 +1,11 @@
-# APHELION ASSEMBLER 1.0
+# APHELION ASSEMBLER 1.2
 # BY TECHNICHRON
 
 import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-let asmfile = "code/sample.asm"
+let asmfile = "code/helloworld.asm"
 
 proc seqStringToString(s: seq[string]): string =
     for i in s.low()..s.high():
@@ -18,6 +18,8 @@ proc getDataType(value: string): string =
         result = $value[1] # x - hex, b - binary, d - decimal, o - octal
     of 'a','A','b','B','c','C','d','D','e','E','l','L','h','H','f','F':
         result = "register"
+    of '\'','\"':
+        result = "char"
     else:
         result = "error"
 
@@ -41,7 +43,16 @@ proc getRegisterCode(value: string): string =
         result = "111"
     else: discard
 
-proc numToBin(num: string, len: int): string =
+proc numToBin(numinput: string, len: int): string =
+
+    var num = numinput
+    if numinput[0] == '\'':
+        num = num.strip(chars = {'\''})
+        num = "0d" & $int(char(num[0]))
+    if numinput[0] == '\"':
+        num = num.strip(chars = {'\"'})
+        num = "0d" & $int(char(num[0]))
+        
     var decimal: int
     case getDataType(num)
     of "x":
@@ -59,6 +70,8 @@ proc numToBin(num: string, len: int): string =
         result = insertSep(toBin(decimal, 16), ' ', 8)
 
 proc levelOneFlatten(f: string): seq[string] =
+
+
 
     var file = splitLines(f)    # deliniate
 
@@ -198,7 +211,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("0001")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -214,7 +227,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("0010")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -228,7 +241,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("0011")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -242,7 +255,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("0100")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -258,7 +271,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("0101")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -274,7 +287,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("0110")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -290,7 +303,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("0111")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -306,7 +319,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("1010")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -322,7 +335,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("1011")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -342,7 +355,7 @@ proc levelOneBinaryConversion(input: seq[string]): string =
             result.add("1101")
 
             case getDataType(line.split()[2])
-            of "x", "b","d", "o":
+            of "x", "b","d", "o", "char":
                 result.add("1")
                 result.add(getRegisterCode(line.split()[1]))
                 result.add(" ")
@@ -447,7 +460,7 @@ proc main() =
     let binaryTextFile = levelOneBinaryConversion(flattened)
     let binaryFile = txtToBin(binaryTextFile)
 
-    writeFile("code/flattened.txt", seqStringToString(flattened))
+    #writeFile("code/flattened.txt", seqStringToString(flattened))
     #writeFile("assembler/output.txt", binaryTextFile)
     writeFile("code/output.bin", binaryFile)
 
