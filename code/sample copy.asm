@@ -1,10 +1,6 @@
-# Aphelion Assembly Language Version 1
+%define asciistart, 'a'
+%define asciiend, 'Z'
 
-@define out, 0xFFFF
-@define address, 0x9001
-
-@define asciistart, 'a'
-@define asciiend, 'Z'
 
 main:
     set a, asciistart

@@ -1,0 +1,44 @@
+
+╔════════════════════════════════╗
+║ APHELION ASSEMBLY LANGUAGE 1.0 ║
+╚════════════════════════════════╝
+
+══ INSTRUCTIONS ══
+
+    IDENTIFIER │ ARGUMENTS                           │ DESCRIPTION
+    ───────────┼─────────────────────────────────────┼─────────────────────────────────────────────────
+    NOP        │ N/A                                 │ no instruction
+    SET        │ reg1, (reg2/imm8)                   │ reg1 (reg2/imm8)
+    LOAD       │ reg, (HL/imm16)                     │ load reg with value at address (HL/imm16)
+    SAVE       │ reg, (HL/imm16)                     │ store value in reg at address (HL/imm16)
+    DSAVE  *   │ imm8, (HL/imm16)                    │ store imm8 at address (HL/imm16)
+    ADD      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 + (reg2/imm8)
+    ADC      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 + (reg2/imm8) + carry
+    SUB      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 - (reg2/imm8)
+    SBB      † │ reg1, (reg2/imm8)                   │ reg1 = reg1 - (reg2/imm8) - borrow
+    JMP        │ (HL/label/imm16)                    │ PC = (HL/imm16)
+    JNZ      † │ reg, (HL/label/imm16)               │ PC = (HL/imm16) if reg != 0
+    JEZ    * † │ reg, (HL/label/imm16)               │ PC = (HL/imm16) if reg == 0
+    JEQ    * † │ reg1, (reg2/imm8), (HL/label/imm16) │ PC = (HL/imm16) if reg1 == reg2
+    JNE    * † │ reg1, (reg2/imm8), (HL/label/imm16) │ PC = (HL/imm16) if reg1 != reg2
+    JLT    * † │ reg1, (reg2/imm8), (HL/label/imm16) │ PC = (HL/imm16) if reg1 < reg2
+    JGT    * † │ reg1, (reg2/imm8), (HL/label/imm16) │ PC = (HL/imm16) if reg1 > reg2
+    JLE    * † │ reg1, (reg2/imm8), (HL/label/imm16) │ PC = (HL/imm16) if reg1 <= reg2
+    JGE    * † │ reg1, (reg2/imm8), (HL/label/imm16) │ PC = (HL/imm16) if reg1 >= reg2
+    AND        │ reg1, (reg2/imm8)                   │ reg1 = reg1 & (reg2/imm8)
+    OR         │ reg1, (reg2/imm8)                   │ reg1 = reg1 | (reg2/imm8)
+    NOT        │ reg                                 │ reg = !reg
+    CMP      † │ reg1, (reg2/imm8)                   │ compare reg1 to (reg2/imm8) and set flags
+    HCF        │ N/A                                 │ halt and catch fire
+    
+    * compound instruction - does not have a corresponding opcode, but expanded into core instructions by the assembler
+      see "compoundexpansion.txt" for how these instructions expand.
+    † modifies flags
+
+══ CONSTANTS ══
+
+    use "@define" to define constant values. For example:
+
+        @define startAddress, 0xB4FA
+
+    The assembler uses this and replaces every instance of 'startAddress' with '0xB4FA'.
