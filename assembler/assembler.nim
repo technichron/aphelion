@@ -5,7 +5,7 @@ import std/strutils, std/sequtils
 
 const PunctuationChars = {'!'..'/', ':'..'@', '['..'`', '{'..'~'}
 
-let asmfile = "./code/sample.asm"
+let asmfile = "./code/macrotest.asm"
 
 proc seqStringToString(s: seq[string]): string =
     for i in s.low()..s.high():
@@ -69,15 +69,12 @@ proc numToBin(numinput: string, len: int): string =
     if len == 16:
         result = insertSep(toBin(decimal, 16), ' ', 8)
 
-proc levelOneFlatten(f: string): seq[string] =
+proc levelOneFlatten(f: seq[string]): seq[string] =
 
-
-
-    var file = splitLines(f)    # deliniate
 
     #result = $char(fromHex[uint]("61"))
 
-    file = file.filterIt(it.len != 0)
+    var file = f.filterIt(it.len != 0)
 
     for i in file.low()..file.high():                               # strip leading and trailing whitespace
         file[i] = strip(file[i])
@@ -127,7 +124,9 @@ proc levelOneFlatten(f: string): seq[string] =
 
     result = file
 
-proc compoundTemplateExpansion(f: seq[string]): seq[string] =
+proc compoundTemplateExpansion(file: string): seq[string] =
+    
+    let f = splitLines(file)    # deliniate
     
     var newfile = f
 
@@ -136,60 +135,66 @@ proc compoundTemplateExpansion(f: seq[string]): seq[string] =
 
         if normalize(instruction[0]) == "dsave":
 
-            newfile[line] =                 "set e " & instruction[1] & "\n"
-            newfile[line] = newfile[line] & "save e " & instruction[2]
+            newfile[line] =                 "set e, " & instruction[1] & "\n"
+            newfile[line] = newfile[line] & "save e, " & instruction[2]
         
         if normalize(instruction[0]) == "jez":
 
-            newfile[line] =                 "cmp " & instruction[1] & " 0\n"
-            newfile[line] = newfile[line] & "set e f\n"
-            newfile[line] = newfile[line] & "and e 0b00000001\n"
-            newfile[line] = newfile[line] & "jnz e " & instruction[2]
+            newfile[line] =                 "cmp " & instruction[1] & ", 0\n"
+            newfile[line] = newfile[line] & "set e, f\n"
+            newfile[line] = newfile[line] & "and e, 0b00000001\n"
+            newfile[line] = newfile[line] & "jnz e, " & instruction[2]
         
         if normalize(instruction[0]) == "jeq":
             
-            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
-            newfile[line] = newfile[line] & "set e f\n"
-            newfile[line] = newfile[line] & "and e 0b00000100\n"
-            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+            newfile[line] =                 "cmp " & instruction[1] & ", " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e, f\n"
+            newfile[line] = newfile[line] & "and e, 0b00000100\n"
+            newfile[line] = newfile[line] & "jnz e, " & instruction[3]
 
         if normalize(instruction[0]) == "jne":
 
-            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
-            newfile[line] = newfile[line] & "set e f\n"
+            newfile[line] =                 "cmp " & instruction[1] & ", " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e, f\n"
             newfile[line] = newfile[line] & "not e\n"
-            newfile[line] = newfile[line] & "and e 0b00000100\n"
-            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+            newfile[line] = newfile[line] & "and e, 0b00000100\n"
+            newfile[line] = newfile[line] & "jnz e, " & instruction[3]
         
         if normalize(instruction[0]) == "jlt":
 
-            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
-            newfile[line] = newfile[line] & "set e f\n"
-            newfile[line] = newfile[line] & "and e 0b00000010\n"
-            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+            newfile[line] =                 "cmp " & instruction[1] & ", " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e, f\n"
+            newfile[line] = newfile[line] & "and e, 0b00000010\n"
+            newfile[line] = newfile[line] & "jnz e, " & instruction[3]
         
         if normalize(instruction[0]) == "jgt":
 
             newfile[line] =                 "set e, " & instruction[2] & "\n"
-            newfile[line] = newfile[line] & "cmp e " & instruction[1] & "\n"
-            newfile[line] = newfile[line] & "set e f\n"
-            newfile[line] = newfile[line] & "and e 0b00000010\n"
-            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+            newfile[line] = newfile[line] & "cmp e, " & instruction[1] & "\n"
+            newfile[line] = newfile[line] & "set e, f\n"
+            newfile[line] = newfile[line] & "and e, 0b00000010\n"
+            newfile[line] = newfile[line] & "jnz e, " & instruction[3]
         
         if normalize(instruction[0]) == "jle":
 
-            newfile[line] =                 "cmp " & instruction[1] & " " & instruction[2] & "\n"
-            newfile[line] = newfile[line] & "set e f\n"
-            newfile[line] = newfile[line] & "and e 0b00000110\n"
-            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+            newfile[line] =                 "cmp " & instruction[1] & ", " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "set e, f\n"
+            newfile[line] = newfile[line] & "and e, 0b00000110\n"
+            newfile[line] = newfile[line] & "jnz e, " & instruction[3]
 
         if normalize(instruction[0]) == "jge":
 
-            newfile[line] =                 "set e " & instruction[2] & "\n"
-            newfile[line] = newfile[line] & "cmp e " & instruction[1] & "\n"
-            newfile[line] = newfile[line] & "set e f\n"
-            newfile[line] = newfile[line] & "and e 0b00000110\n"
-            newfile[line] = newfile[line] & "jnz e " & instruction[3]
+            newfile[line] =                 "set e, " & instruction[2] & "\n"
+            newfile[line] = newfile[line] & "cmp e, " & instruction[1] & "\n"
+            newfile[line] = newfile[line] & "set e, f\n"
+            newfile[line] = newfile[line] & "and e, 0b00000110\n"
+            newfile[line] = newfile[line] & "jnz e, " & instruction[3]
+        
+        if normalize(instruction[0]) == "push": #macro testing shit
+            newfile[line] = "load l stackpointerl\nload h stackpointerh\nsub l, 1\nsbb h 0\nsave l stackpointerl\nsave h, stackpointerh\nsave $1, hl" % [instruction[1]] 
+        
+        if normalize(instruction[0]) == "pop": #macro testing shit
+            newfile[line] = "load l, stackpointerl\nload h, stackpointerh\nload (reg), hl\nadd l, 1\nadc h, 0\nsave l, stackpointerl\nsave h, stackpointerh" % [instruction[1]] 
     
     result = seqStringToString(newfile).splitLines()
     for i in result.low()..result.high():
@@ -455,12 +460,12 @@ proc main() =
 
     let raw = readFile(asmfile)
 
-    let flattened = compoundTemplateExpansion(levelOneFlatten(raw))
+    let flattened = levelOneFlatten(compoundTemplateExpansion(raw))
 
     let binaryTextFile = levelOneBinaryConversion(flattened)
     let binaryFile = txtToBin(binaryTextFile)
 
-    #writeFile("code/flattened.txt", seqStringToString(flattened))
+    writeFile("code/flattened.txt", seqStringToString(flattened))
     #writeFile("assembler/output.txt", binaryTextFile)
     writeFile("code/output.bin", binaryFile)
 
