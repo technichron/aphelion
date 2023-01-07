@@ -6,6 +6,10 @@ import std/strutils, std/sequtils
 
 proc takeCMDLineArguments() =
 
+proc encodeArguments(f: string): string =
+    for c in f.low()..f.high():
+        if f[c] == '\'' and f[c+2] == '\'':
+            echo f[c+1]
 
 proc cleanse(f: string): string =
 
@@ -35,6 +39,8 @@ proc cleanse(f: string): string =
 proc main():
 
     takeCMDLineArguments() # determines parameters from command line arguments
+
+    encodeArguments()
 
     cleanse() # removes comments
 
