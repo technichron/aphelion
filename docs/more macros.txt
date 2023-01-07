@@ -1,0 +1,48 @@
+stack control and subroutine macros (aphelion 1.0) by LFalch!
+
+@define stackpointerl, 0xff00
+@define stackpointerh, 0xff01
+
+@macro push (reg) =
+    load l, stackpointerl
+    load h, stackpointerh
+    sub l, 1
+    sbb h, 0
+    save l, stackpointerl
+    save h, stackpointerh
+    save (reg), hl
+@endmacro
+
+@macro pop (reg) =
+    load l, stackpointerl
+    load h, stackpointerh
+    load (reg), hl
+    add l, 1
+    adc h, 0
+    save l, stackpointerl
+    save h, stackpointerh
+@endmacro
+
+@macro call (label/imm16) =
+    load h, 0xFFF1
+    load l, 0xFFF2
+    add l, SMTH
+    adc h, 0
+    save 0xFFF3, h
+    save 0xFFF4, l
+    load e, 0xFFF3
+    push e
+    load e, 0xFFF4
+    push e
+    jmp (label/imm16)
+@endmacro
+
+@macro ret =
+    pop e
+    save 0xFFF3, e
+    pop e
+    save 0xFFF4, e
+    load l, 0xFFF3
+    load h, 0xFFF4
+    jmp lh
+@endmacro
