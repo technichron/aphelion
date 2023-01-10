@@ -44,8 +44,8 @@ DOUBLE REGISTERS (16-bit)
     0b01001  J  general
     0b01010  K  general
     0b01011  P  program counter
-    0b01100  S  stack pointer
-    0b01101  R  return pointer    * mirrors the top entry in the return address stack
+    0b01100  S  stack pointer   * initialized to the top of ram, 0xFFF0
+    0b01101  R  return pointer
 
 
 
@@ -58,16 +58,16 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     sub (op1), (op2)            (op1) = (op1) - (op2)
     sbb (op1), (op2)            (op1) = (op1) - (op2) - BORROW
     jmp (loc)                   set P to (loc)
-    call (loc)                  set P to (loc) and push address of the following instruction to RAS
+    call (loc)                  set P to (loc) and set R to address of the following instruction
     jif (flags), (loc)          set P to (loc) if every flag specified in (flags) is set
     callif (flags), (loc)       set P to (loc) and set R to address of the following instruction if every flag specified in (flags) is set
-    ret                         set P to value popped off of RAS
+    ret                         set P to return pointer
     push (value)                push (value) onto stack
-    pop (register)              pop value from stack to (register)
+    pop (dest)                  pop value from stack to (dest)
     and (op1), (op2)            (op1) = (op1) & (op2)
     or (op1), (op2)             (op1) = (op1) | (op2)
     not (op)                    (op) = ! (op)
-    cmp (op1), (op2)            compare (op1) and (op2), sets relevant flags
+    cmp (op1), (op2)            compare (op1) and (op2), set relevant flags
     hcf                         halt and catch fire
 
 
