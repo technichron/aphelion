@@ -1,0 +1,97 @@
+╔══════════════════╗
+║ APHELION ISA 2.0 ║ by technichron
+╚══════════════════╝
+
+8-bit word length
+16-bit address space
+
+MEMORY
+
+    ROM         0x0000-0x8FFF
+    RAM         0x9000-0xFFF0
+    RESERVED    0xFFF1-0xFFFE
+    STDIO       0xFFFF-0xFFFF
+
+
+
+REGISTERS (8-bit)
+
+    0b00000  A  general
+    0b00001  B  general
+    0b00010  C  general
+    0b00011  D  general
+    0b00100  E  general
+    0b00101  F  flags
+    0b00110  G  general
+    0b01000  IL general - low  byte of I
+    0b11000  IH general - high byte of I
+    0b01001  JL general - low  byte of J
+    0b11001  JH general - high byte of J
+    0b01010  KL general - low  byte of K
+    0b11010  KH general - high byte of K
+    0b01011  PL program counter - low  byte of P
+    0b11011  PH program counter - high byte of P
+    0b01100  SL stack pointer - low  byte of S
+    0b11100  SH stack pointer - high byte of S
+    0b01101  RL return pointer - low  byte of R
+    0b11101  RH return pointer - high byte of R
+
+
+
+DOUBLE REGISTERS (16-bit)
+
+    0b01000  I  general
+    0b01001  J  general
+    0b01010  K  general
+    0b01011  P  program counter
+    0b01100  S  stack pointer
+    0b01101  R  return pointer    * mirrors the top entry in the return address stack
+
+
+
+INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive reference.
+
+    nop                         no operation
+    mov (src), (dest)           copy data from (src) to (dest)
+    add (op1), (op2)            (op1) = (op1) + (op2)
+    adc (op1), (op2)            (op1) = (op1) + (op2) + CARRY
+    sub (op1), (op2)            (op1) = (op1) - (op2)
+    sbb (op1), (op2)            (op1) = (op1) - (op2) - BORROW
+    jmp (loc)                   set P to (loc)
+    call (loc)                  set P to (loc) and push address of the following instruction to RAS
+    jif (flags), (loc)          set P to (loc) if every flag specified in (flags) is set
+    callif (flags), (loc)       set P to (loc) and set R to address of the following instruction if every flag specified in (flags) is set
+    ret                         set P to value popped off of RAS
+    push (value)                push (value) onto stack
+    pop (register)              pop value from stack to (register)
+    and (op1), (op2)            (op1) = (op1) & (op2)
+    or (op1), (op2)             (op1) = (op1) | (op2)
+    not (op)                    (op) = ! (op)
+    cmp (op1), (op2)            compare (op1) and (op2), sets relevant flags
+    hcf                         halt and catch fire
+
+
+
+MACRO INSTRUCTIONS  * built-in macros.
+
+    out (op)                    put value out to stdout; simple alias for `mov (op), 0xFFFF`
+    in (reg)                    get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
+    jez (loc)                   jump to (loc) if ZERO is set
+    jnz (loc)                   jump to (loc) if ZERO is not set
+    jeq (loc)                   jump to (loc) if EQUAL is set
+    jne (loc)                   jump to (loc) if EQUAL is not set
+    jlt (loc)                   jump to (loc) if LESS is set
+    jgt (loc)                   jump to (loc) if GREATER is set
+    jle (loc)                   jump to (loc) if LESS or EQUAL is set
+    jge (loc)                   jump to (loc) if GREATER or EQUAL is set
+    cez (loc)                   call (loc) if ZERO is set
+    cnz (loc)                   call (loc) if ZERO is not set
+    ceq (loc)                   call (loc) if EQUAL is set
+    cne (loc)                   call (loc) if EQUAL is not set
+    clt (loc)                   call (loc) if LESS is set
+    cgt (loc)                   call (loc) if GREATER is set
+    cle (loc)                   call (loc) if LESS or EQUAL is set
+    cge (loc)                   call (loc) if GREATER or EQUAL is set
+    nand (op1), (op2)           (op1) = ! ((op1) & (op2))
+    xor (op1), (op2)            (op1) = (op1) ⊕ (op2)
+    xnor (op1), (op2)           (op1) = ! ((op1) ⊕ (op2))
