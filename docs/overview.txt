@@ -50,7 +50,7 @@ DOUBLE REGISTERS (16-bit)
 
 
 
-INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive reference.
+INSTRUCTIONS    * this is an overview. see 'instructions.txt' for a comprehensive reference.
 
     nop                         no operation
     mov (src), (dest)           copy data from (src) to (dest)
@@ -73,7 +73,7 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
 
 
 
-MACRO INSTRUCTIONS  * built-in macros.
+MACRO INSTRUCTIONS  * built-in macro definitions
 
     out (op)                    put value out to stdout; simple alias for `mov (op), 0xFFFF`
     in (reg)                    get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
