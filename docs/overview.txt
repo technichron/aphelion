@@ -3,6 +3,7 @@
 ╚══════════════════╝
 
 8-bit word length
+little-endian
 16-bit address space
 
 MEMORY
@@ -21,7 +22,7 @@ REGISTERS (8-bit)
     0b00010  C  general
     0b00011  D  general
     0b00100  E  general
-    0b00101  F  flags
+    0b00101  F  flags                               00[carry][borrow][greater][equal][less][zero]
     0b00110  G  general
     0b01000  IL general - low  byte of I
     0b11000  IH general - high byte of I
@@ -77,7 +78,7 @@ MACRO INSTRUCTIONS  * built-in macros.
     out (op)                    put value out to stdout; simple alias for `mov (op), 0xFFFF`
     in (reg)                    get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
     jez (loc)                   jump to (loc) if ZERO is set
-    jnz (loc)                   jump to (loc) if ZERO is not set
+    jnz (loc)                   jump to (loc) if ZERO is not set    * (can also be called with 'jens')
     jeq (loc)                   jump to (loc) if EQUAL is set
     jne (loc)                   jump to (loc) if EQUAL is not set
     jlt (loc)                   jump to (loc) if LESS is set
@@ -95,3 +96,4 @@ MACRO INSTRUCTIONS  * built-in macros.
     nand (op1), (op2)           (op1) = ! ((op1) & (op2))
     xor (op1), (op2)            (op1) = (op1) ⊕ (op2)
     xnor (op1), (op2)           (op1) = ! ((op1) ⊕ (op2))
+    jeans                       print ascii jeans to stdout     * funny
