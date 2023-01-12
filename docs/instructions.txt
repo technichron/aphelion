@@ -41,14 +41,14 @@ INSTRUCTION SET
     jmp (loc)                   set program counter to (loc)
         jmp label/$imm16            0x19 0b011001
 
-    jsr (loc)                   set program counter to (loc) and set R to address of the following instruction
-        jsr label/$imm16            0x1A 0b011010
+    call (loc)                  set program counter to (loc) and set R to address of the following instruction
+        call label/$imm16           0x1A 0b011010
 
-    jfl (flags), (loc)          set program counter to (loc) if every flag in (flags) is set
-        jfl imm8, label/$imm16      0x1B 0b011011
+    jif (flags), (loc)          set program counter to (loc) if every flag in (flags) is set
+        jif imm8, label/$imm16      0x1B 0b011011
 
-    jsf(flags), (loc)           set program counter to (loc) and set R to address of the following instruction if every flag in (flags) is set
-        jsf imm8, label/$imm16      0x1C 0b011100
+    call (flags), (loc)         set program counter to (loc) and set R to address of the following instruction if every flag in (flags) is set
+        call imm8, label/$imm16     0x1C 0b011100
 
     ret                         set program counter to R
         ret                         0x1D 0b011101
