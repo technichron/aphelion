@@ -1,5 +1,5 @@
 
-INSTRUCTION SET
+INSTRUCTION SET                     opcode-hex opcode-binary argument-type
 
     nop - no instruction
         nop                         0x00 0b000000 NA
@@ -15,95 +15,95 @@ INSTRUCTION SET
         mov $imm16, $imm16          0x08 0b001000 DD
 
     add (op1), (op2)            (op1) = (op1) + (op2)
-        add reg, reg                0x09 0b001001
-        add reg, imm8               0x0A 0b001010
-        add dreg, dreg              0x0B 0b001011
-        add dreg, imm16             0x0C 0b001100
+        add reg, reg                0x09 0b001001 RR
+        add reg, imm8               0x0A 0b001010 RB
+        add dreg, dreg              0x0B 0b001011 RR
+        add dreg, imm16             0x0C 0b001100 RD
 
     adc (op1), (op2)            (op1) = (op1) + (op2) + CARRY
-        adc reg, reg                0x0D 0b001101
-        adc reg, imm8               0x0E 0b001110
-        adc dreg, dreg              0x0F 0b001111
-        adc dreg, imm16             0x10 0b010000
+        adc reg, reg                0x0D 0b001101 RR
+        adc reg, imm8               0x0E 0b001110 RB
+        adc dreg, dreg              0x0F 0b001111 RR
+        adc dreg, imm16             0x10 0b010000 RD
 
     sub (op1), (op2)            (op1) = (op1) - (op2)
-        sub reg, reg                0x11 0b010001
-        sub reg, imm8               0x12 0b010010
-        sub dreg, dreg              0x13 0b010011
-        sub dreg, imm16             0x14 0b010100
+        sub reg, reg                0x11 0b010001 RR
+        sub reg, imm8               0x12 0b010010 RB
+        sub dreg, dreg              0x13 0b010011 RR
+        sub dreg, imm16             0x14 0b010100 RD
 
     sbb (op1), (op2)            (op1) = (op1) - (op2) - BORROW
-        sbb reg, reg                0x15 0b010101
-        sbb reg, imm8               0x16 0b010110
-        sbb dreg, dreg              0x17 0b010111
-        sbb dreg, imm16             0x18 0b011000
+        sbb reg, reg                0x15 0b010101 RR
+        sbb reg, imm8               0x16 0b010110 RB
+        sbb dreg, dreg              0x17 0b010111 RR
+        sbb dreg, imm16             0x18 0b011000 RD
 
     jmp (loc)                   set program counter to (loc)
-        jmp label/$imm16            0x19 0b011001
+        jmp label/$imm16            0x19 0b011001 DO
 
     call (loc)                  set program counter to (loc) and set R to address of the following instruction
-        call label/$imm16           0x1A 0b011010
+        call label/$imm16           0x1A 0b011010 DO
 
-    jif (flags), (loc)          set program counter to (loc) if every flag in (flags) is set
-        jif imm8, label/$imm16      0x1B 0b011011
+    jif (flags), (loc)          set program counter to (loc) if F && (flags) == (flags)
+        jif imm8, label/$imm16      0x1B 0b011011 BD
 
-    call (flags), (loc)         set program counter to (loc) and set R to address of the following instruction if every flag in (flags) is set
-        call imm8, label/$imm16     0x1C 0b011100
+    call (flags), (loc)         set program counter to (loc) and set R to address of the following instruction if F && (flags) == (flags)
+        call imm8, label/$imm16     0x1C 0b011100 BD
 
     ret                         set program counter to R
-        ret                         0x1D 0b011101
+        ret                         0x1D 0b011101 NA
 
     push (value)                push (value) onto stack
-        push reg                    0x1E 0b011110
-        push dreg                   0x1F 0b011111
-        push imm8                   0x20 0b100000
-        push imm16                  0x21 0b100001
+        push reg                    0x1E 0b011110 RE
+        push dreg                   0x1F 0b011111 RE
+        push imm8                   0x20 0b100000 BY
+        push imm16                  0x21 0b100001 DO
 
     pop (dest)                  pop value from stack to (dest)
-        pop reg                     0x22 0b100010
-        pop dreg                    0x23 0b100011
+        pop reg                     0x22 0b100010 RE
+        pop dreg                    0x23 0b100011 RE
 
     and (op1), (op2)            (op1) = (op1) & (op2)
-        and reg, reg                0x24 0b100100
-        and reg, imm8               0x25 0b100101
-        and dreg, dreg              0x26 0b100110
-        and dreg, imm16             0x27 0b100111
+        and reg, reg                0x24 0b100100 RR
+        and reg, imm8               0x25 0b100101 RB
+        and dreg, dreg              0x26 0b100110 RR
+        and dreg, imm16             0x27 0b100111 RD
 
     or (op1), (op2)             (op1) = (op1) | (op2)
-        or reg, reg                 0x28 0b101000
-        or reg, imm8                0x29 0b101001
-        or dreg, dreg               0x2A 0b101010
-        or dreg, imm16              0x2B 0b101011
+        or reg, reg                 0x28 0b101000 RR
+        or reg, imm8                0x29 0b101001 RB
+        or dreg, dreg               0x2A 0b101010 RR
+        or dreg, imm16              0x2B 0b101011 RD
 
     not (op)                    (op) = ! (op)
-        not reg                     0x2C 0b101100
-        not dreg                    0x2D 0b101101
+        not reg                     0x2C 0b101100 RE
+        not dreg                    0x2D 0b101101 RE
 
     cmp (op1), (op2)            compare (op1) and (op2), set relevant flags
-        cmp reg, reg                0x2E 0b101110
-        cmp reg, imm8               0x2F 0b101111
-        cmp dreg, dreg              0x30 0b110000
-        cmp dreg, imm16             0x31 0b110001
+        cmp reg, reg                0x2E 0b101110 RR
+        cmp reg, imm8               0x2F 0b101111 RB
+        cmp dreg, dreg              0x30 0b110000 RR
+        cmp dreg, imm16             0x31 0b110001 RD
     
     scmp (op1), (op2)           compare (op1) and (op2) as two's complement signed integers, set relevant flags
-        cmp reg, reg                0x32 0b110010
-        cmp reg, imm8               0x33 0b110011
-        cmp dreg, dreg              0x34 0b110100
-        cmp dreg, imm16             0x35 0b110101
+        cmp reg, reg                0x32 0b110010 RR
+        cmp reg, imm8               0x33 0b110011 RB
+        cmp dreg, dreg              0x34 0b110100 RR
+        cmp dreg, imm16             0x35 0b110101 RD
     
-    shl (op), (amount)          logical/arithmetic bit shift left
-        shl reg, imm8               0x36 0b110110
-        shl dreg, imm8              0x37 0b110111
+    shl (op), (amount)          logical/arithmetic bit shift left (amount) bits     * can also be called with 'asl' and 'lsl'
+        shl reg, imm8               0x36 0b110110 RB
+        shl dreg, imm8              0x37 0b110111 RB
 
     asr (op), (amount)          arithmetic bit shift (op) right (amount) bits
-        asr reg, imm8               0x38 0b111000
-        asr dreg, imm8              0x39 0b111001
+        asr reg, imm8               0x38 0b111000 RB
+        asr dreg, imm8              0x39 0b111001 RB
 
     lsr (op), (amount)          logical bit shift (op) right (amount) bits
-        lsr reg, imm8               0x3A 0b111010
-        lsr dreg, imm8              0x3B 0b111011
+        lsr reg, imm8               0x3A 0b111010 RB
+        lsr dreg, imm8              0x3B 0b111011 RB
 
     hcf                         halt and catch fire
-        hcf                         0x3F 0b111111
+        hcf                         0x3F 0b111111 NA
 
     
