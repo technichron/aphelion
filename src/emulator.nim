@@ -11,9 +11,6 @@ proc loadAMG(memarray: var array[0x10000, uint8], path: string) =
     if amg.len() == 0x10000:
         for index in 0..0xFFFF:
             memarray[index] = uint8(amg[index])
+        echo "image loaded"
     else:
         echo "image file is improper length: 65536 bytes expected, got ", len(amg), " bytes"
-
-MemorySpace.loadAMG("h")
-
-echo MemorySpace[0]
