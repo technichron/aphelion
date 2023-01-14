@@ -63,12 +63,16 @@ INSTRUCTIONS    * this is an overview. see 'instructions.txt' for a comprehensiv
     jif (flags), (loc)          set P to (loc) if every flag specified in (flags) is set
     callif (flags), (loc)       set P to (loc) and set R to address of the following instruction if every flag specified in (flags) is set
     ret                         set P to return pointer
-    push (value)                push (value) onto stack
+    push (value)                push (value) onto stack         * most significant byte of int16 pushed first
     pop (dest)                  pop value from stack to (dest)
     and (op1), (op2)            (op1) = (op1) & (op2)
     or (op1), (op2)             (op1) = (op1) | (op2)
     not (op)                    (op) = ! (op)
     cmp (op1), (op2)            compare (op1) and (op2), set relevant flags
+    scmp (op1), (op2)           compare (op1) and (op2) as signed integers (two's complement), set relevant flags
+    shl (op), (amount)          logical/arithmetic bit shift left       * can also be called with 'asl' and 'lsl'
+    asr (op), (amount)          arithmetic bit shift (op) right (amount) bits
+    lsr (op), (amount)          logical bit shift (op) right (amount) bits
     hcf                         halt and catch fire
 
 
@@ -78,7 +82,7 @@ MACRO INSTRUCTIONS  * built-in macro definitions
     out (op)                    put value out to stdout; simple alias for `mov (op), 0xFFFF`
     in (reg)                    get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
     jez (loc)                   jump to (loc) if ZERO is set
-    jnz (loc)                   jump to (loc) if ZERO is not set    * (can also be called with 'jens')
+    jnz (loc)                   jump to (loc) if ZERO is not set    * can also be called with 'jens'
     jeq (loc)                   jump to (loc) if EQUAL is set
     jne (loc)                   jump to (loc) if EQUAL is not set
     jlt (loc)                   jump to (loc) if LESS is set

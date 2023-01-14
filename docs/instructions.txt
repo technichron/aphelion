@@ -84,6 +84,26 @@ INSTRUCTION SET
         cmp reg, imm8               0x2F 0b101111
         cmp dreg, dreg              0x30 0b110000
         cmp dreg, imm16             0x31 0b110001
+    
+    scmp (op1), (op2)           compare (op1) and (op2) as two's complement signed integers, set relevant flags
+        cmp reg, reg                0x32 0b110010
+        cmp reg, imm8               0x33 0b110011
+        cmp dreg, dreg              0x34 0b110100
+        cmp dreg, imm16             0x35 0b110101
+    
+    shl (op), (amount)          logical/arithmetic bit shift left
+        shl reg, imm8               0x36 0b110110
+        shl dreg, imm8              0x37 0b110111
+
+    asr (op), (amount)          arithmetic bit shift (op) right (amount) bits
+        asr reg, imm8               0x38 0b111000
+        asr dreg, imm8              0x39 0b111001
+
+    lsr (op), (amount)          logical bit shift (op) right (amount) bits
+        lsr reg, imm8               0x3A 0b111010
+        lsr dreg, imm8              0x3B 0b111011
 
     hcf                         halt and catch fire
         hcf                         0x3F 0b111111
+
+    
