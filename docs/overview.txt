@@ -58,8 +58,8 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     adc (op1), (op2)            (op1) = (op1) + (op2) + CARRY
     sub (op1), (op2)            (op1) = (op1) - (op2)
     sbb (op1), (op2)            (op1) = (op1) - (op2) - BORROW
-    jmp (loc)                   set P to (loc)
-    call (loc)                  set P to (loc) and set R to address of the following instruction
+    jmp (loc)                 † set P to (loc)
+    call (loc)                † set P to (loc) and set R to address of the following instruction
     jif (flags), (loc)          set P to (loc) if F & (flags) == (flags)
     callif (flags), (loc)       set P to (loc) and set R to address of the following instruction if F & (flags) == (flags)
     ret                         set P to return pointer
@@ -74,30 +74,25 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     asr (op), (amount)          arithmetic bit shift (op) right (amount) bits
     lsr (op), (amount)          logical bit shift (op) right (amount) bits
     hcf                         halt and catch fire
-
-
-
-MACRO INSTRUCTIONS  * built-in macro definitions
-
-    out (op)                    put value out to stdout; simple alias for `mov (op), 0xFFFF`
-    in (reg)                    get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
-    jez (loc)                   jump to (loc) if ZERO is set
-    jnz (loc)                   jump to (loc) if ZERO is not set    * can also be called with 'jens'
-    jeq (loc)                   jump to (loc) if EQUAL is set
-    jne (loc)                   jump to (loc) if EQUAL is not set
-    jlt (loc)                   jump to (loc) if LESS is set
-    jgt (loc)                   jump to (loc) if GREATER is set
-    jle (loc)                   jump to (loc) if LESS or EQUAL is set
-    jge (loc)                   jump to (loc) if GREATER or EQUAL is set
-    cez (loc)                   call (loc) if ZERO is set
-    cnz (loc)                   call (loc) if ZERO is not set
-    ceq (loc)                   call (loc) if EQUAL is set
-    cne (loc)                   call (loc) if EQUAL is not set
-    clt (loc)                   call (loc) if LESS is set
-    cgt (loc)                   call (loc) if GREATER is set
-    cle (loc)                   call (loc) if LESS or EQUAL is set
-    cge (loc)                   call (loc) if GREATER or EQUAL is set
-    nand (op1), (op2)           (op1) = ! ((op1) & (op2))
-    xor (op1), (op2)            (op1) = (op1) ⊕ (op2)
-    xnor (op1), (op2)           (op1) = ! ((op1) ⊕ (op2))
-    jeans                       print ascii jeans to stdout     * funny
+    out (op)                 †  put value out to stdout; simple alias for `mov (op), 0xFFFF`
+    in (reg)                 †  get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
+    jez (loc)                †  jump to (loc) if ZERO is set
+    jnz (loc)                †  jump to (loc) if ZERO is not set    * can also be called with 'jens'
+    jeq (loc)                †  jump to (loc) if EQUAL is set
+    jne (loc)                †  jump to (loc) if EQUAL is not set
+    jlt (loc)                †  jump to (loc) if LESS is set
+    jgt (loc)                †  jump to (loc) if GREATER is set
+    jle (loc)                †  jump to (loc) if LESS or EQUAL is set
+    jge (loc)                †  jump to (loc) if GREATER or EQUAL is set
+    cez (loc)                †  call (loc) if ZERO is set
+    cnz (loc)                †  call (loc) if ZERO is not set
+    ceq (loc)                †  call (loc) if EQUAL is set
+    cne (loc)                †  call (loc) if EQUAL is not set
+    clt (loc)                †  call (loc) if LESS is set
+    cgt (loc)                †  call (loc) if GREATER is set
+    cle (loc)                †  call (loc) if LESS or EQUAL is set
+    cge (loc)                †  call (loc) if GREATER or EQUAL is set
+    nand (op1), (op2)        †  (op1) = ! ((op1) & (op2))
+    xor (op1), (op2)         †  (op1) = (op1) ⊕ (op2)
+    xnor (op1), (op2)        †  (op1) = ! ((op1) ⊕ (op2))
+    jeans                    †  print ascii jeans to stdout     * funny

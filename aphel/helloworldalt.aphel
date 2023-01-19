@@ -2,13 +2,19 @@
 @segment text
     global main
 
-@define stringpointer, 0x9000
 
 main:
-    mov stringpointer, I        # I is used as the pointer for the current character in the string
+    mov 0x9000, I        # I is used as the pointer for the current character in the string
 
     loop:
-        mov
+        mov $I A
+        cmp A, 0
+        jez return
+        out A
+        jmp loop
+        
+    return:
+        halt
 
 
 

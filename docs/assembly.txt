@@ -40,17 +40,13 @@ INSTRUCTION SET                     opcode-hex opcode-binary argument-type
         sbb dreg, dreg              0x17 0b010111 RR
         sbb dreg, imm16             0x18 0b011000 RD
 
-    jmp (loc)                   set program counter to (loc)
-        jmp label/$imm16            0x19 0b011001 DO
-
-    call (loc)                  set program counter to (loc) and set R to address of the following instruction
-        call label/$imm16           0x1A 0b011010 DO
-
     jif (flags), (loc)          set program counter to (loc) if F & (flags) == (flags)
         jif imm8, label/$imm16      0x1B 0b011011 BD
+        jif imm8, $dreg             0x19 0b011001 RB
 
     call (flags), (loc)         set program counter to (loc) and set R to address of the following instruction if F & (flags) == (flags)
         call imm8, label/$imm16     0x1C 0b011100 BD
+        call imm8, $dreg            0x1A 0b011010 RB
 
     ret                         set program counter to R
         ret                         0x1D 0b011101 NA
@@ -120,8 +116,8 @@ SEGMENTATION
 
         [address for first byte] [type] [actual data]
         
-        example: defining a string "hello world!" at $0x9999:
-
+        ex.! defining a string "hello world!" at $0xA032:
+            $0xA032 string "hello world!"
 
 
     Supported data types:
@@ -132,4 +128,4 @@ SEGMENTATION
         int32       32 bit unsigned integer
         sint32      32 bit signed integer
         char        8 bit ascii character
-        string      null terminated sequence of chars
+        string      sequence of chars
