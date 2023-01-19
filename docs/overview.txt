@@ -23,7 +23,7 @@ REGISTERS (8-bit)
     0b00011  D  general
     0b00100  E  general
     0b00101  F  flags                               00[carry][borrow][greater][equal][less][zero]
-    0b00110  G  general
+    0b00110  G  general   UNSAFE                  * reccomended for use w/ macro unpacking
     0b01000  IL general - low  byte of I
     0b11000  IH general - high byte of I
     0b01001  JL general - low  byte of J
@@ -50,7 +50,7 @@ DOUBLE REGISTERS (16-bit)
 
 
 
-INSTRUCTIONS    * this is an overview. see 'instructions.txt' for a comprehensive reference.
+INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive reference.
 
     nop                         no operation
     mov (src), (dest)           copy data from (src) to (dest)
@@ -60,8 +60,8 @@ INSTRUCTIONS    * this is an overview. see 'instructions.txt' for a comprehensiv
     sbb (op1), (op2)            (op1) = (op1) - (op2) - BORROW
     jmp (loc)                   set P to (loc)
     call (loc)                  set P to (loc) and set R to address of the following instruction
-    jif (flags), (loc)          set P to (loc) if F && (flags) == (flags)
-    callif (flags), (loc)       set P to (loc) and set R to address of the following instruction if F && (flags) == (flags)
+    jif (flags), (loc)          set P to (loc) if F & (flags) == (flags)
+    callif (flags), (loc)       set P to (loc) and set R to address of the following instruction if F & (flags) == (flags)
     ret                         set P to return pointer
     push (value)                push (value) onto stack         * most significant byte of int16 pushed first
     pop (dest)                  pop value from stack to (dest)

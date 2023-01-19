@@ -1,3 +1,6 @@
+@segment text
+    global main
+
 @define asciistart, 'a'
 @define asciiend, 'Z'
 

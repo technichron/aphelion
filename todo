@@ -1,2 +1,4 @@
 general:
-	start on emulator and assembler
+	finish emulator
+	finalize assembly syntax
+	start on assembler

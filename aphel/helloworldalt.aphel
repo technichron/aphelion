@@ -1,0 +1,17 @@
+
+@segment text
+    global main
+
+@define stringpointer, 0x9000
+
+main:
+    mov stringpointer, I        # I is used as the pointer for the current character in the string
+
+    loop:
+        mov
+
+
+
+
+@segment data
+    $0x9000 string "hello world!\0"

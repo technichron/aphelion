@@ -13,6 +13,8 @@ INSTRUCTION SET                     opcode-hex opcode-binary argument-type
         mov imm16, dreg             0x06 0b000110 RD
         mov $imm16, reg             0x07 0b000111 RD
         mov $imm16, $imm16          0x08 0b001000 DD
+        mov $dreg, $imm16           0x3C 0b001000 RD
+        mov $dreg, dreg             0x3D 0b001000 RR
 
     add (op1), (op2)            (op1) = (op1) + (op2)
         add reg, reg                0x09 0b001001 RR
@@ -44,10 +46,10 @@ INSTRUCTION SET                     opcode-hex opcode-binary argument-type
     call (loc)                  set program counter to (loc) and set R to address of the following instruction
         call label/$imm16           0x1A 0b011010 DO
 
-    jif (flags), (loc)          set program counter to (loc) if F && (flags) == (flags)
+    jif (flags), (loc)          set program counter to (loc) if F & (flags) == (flags)
         jif imm8, label/$imm16      0x1B 0b011011 BD
 
-    call (flags), (loc)         set program counter to (loc) and set R to address of the following instruction if F && (flags) == (flags)
+    call (flags), (loc)         set program counter to (loc) and set R to address of the following instruction if F & (flags) == (flags)
         call imm8, label/$imm16     0x1C 0b011100 BD
 
     ret                         set program counter to R
@@ -106,4 +108,28 @@ INSTRUCTION SET                     opcode-hex opcode-binary argument-type
     hcf                         halt and catch fire
         hcf                         0x3F 0b111111 NA
 
+MACRO SET
+
+SEGMENTATION
     
+    " @segment text "
+        defines a segment of assembly code. refer to the above for assembly syntax
+    
+    " @segment data "
+        defines a segment of data.
+
+        [address for first byte] [type] [actual data]
+        
+        example: defining a string "hello world!" at $0x9999:
+
+
+
+    Supported data types:
+        int8        8 bit unsigned integer
+        sint8       8 bit signed integer
+        int16       16 bit unsigned integer
+        sint16      16 bit signed integer
+        int32       32 bit unsigned integer
+        sint32      32 bit signed integer
+        char        8 bit ascii character
+        string      null terminated sequence of chars
