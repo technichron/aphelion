@@ -13,9 +13,9 @@ var render = createRenderer(window, -1, Renderer_Software)
 var running = true
 
 
-let fontImage = readImage("src/3dfx8x14.png")
+let fontImage = readImage("src/assets/3dfx8x14.png")
 
-var displayarray: string = "Basic text rendering!"
+var displayarray: string = "big"
 
 proc drawpixel(x,y: int) =
     render.drawPoint(cint((x*2)-1+horizontalMargin),cint((y*2)-1+verticalMargin))
@@ -33,7 +33,6 @@ while running:
     render.present()
     render.setDrawColor(0,0,0,255)
     render.clear()
-
 
 
     var currentRow = 0

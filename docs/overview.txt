@@ -1,5 +1,5 @@
 ╔══════════════════╗
-║ APHELION ISA 2.0 ║ by technichron
+║ APHELION ISA 2.1 ║ by technichron
 ╚══════════════════╝
 
 8-bit word length
@@ -96,3 +96,5 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     xor (op1), (op2)         †  (op1) = (op1) ⊕ (op2)
     xnor (op1), (op2)        †  (op1) = ! ((op1) ⊕ (op2))
     jeans                    †  print ascii jeans to stdout     * funny
+
+    † macro instructions
