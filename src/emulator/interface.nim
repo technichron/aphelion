@@ -1,6 +1,6 @@
 import sdl2
 import pixie
-import std/math, std/os
+import std/math
 
 const horizontalMargin = 5 # pixels
 const verticalMargin = 5   # pixels
@@ -93,8 +93,6 @@ proc characterIn(ch: char) =
         cursorRow = 0
     render.present()
     #echo "char: \'", ch, "\'"
-
-proc rand(x: float): uint8 = uint8( (pow(x, math.sqrt(x)) mod x) mod 256 )
 
 
 var running = true
