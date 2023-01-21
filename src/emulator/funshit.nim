@@ -1,15 +1,19 @@
+
+# this is just fun shit made with "interface.nim". not intended for use in the final emulator.
+
+
 import sdl2
 import pixie
-import std/math, std/os
+import std/math
 
-const horizontalMargin = 5 # pixels
-const verticalMargin = 5   # pixels
-const columns = 80
-const rows = 25
-const charHeight = 14 # pixels
-const charWidth = 8   # pixels
-const charScale = 2
-const controlCharsActive = true
+let horizontalMargin = 5 # pixels
+let verticalMargin = 5   # pixels
+let columns = 80
+let rows = 25
+let charHeight = 14 # pixels
+let charWidth = 8   # pixels
+let charScale = 2
+let controlCharsActive = false
 
 var window = createWindow("aphelion 2.1 terminal", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
 
@@ -37,7 +41,6 @@ proc drawpixel(x,y: int) =
 proc characterIn(ch: char) =
     if controlCharsActive:
         case ch
-            of '\0': discard
             of '\n':
                 cursorCol = 0
                 cursorRow += 1
@@ -52,21 +55,14 @@ proc characterIn(ch: char) =
                         let pcolor = fontImage[1+relativeX, 0+relativeY]
                         render.setDrawColor(pcolor.r, pcolor.b, pcolor.g, pcolor.a)
                         drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
-            of char(0x03):      # clear screen
+            of char(0x03):
                 render.setDrawColor(0,0,0,255)
                 render.clear()
-            of char(0x04):      # clear screen and reset cursor
+            of char(0x04):
                 render.setDrawColor(0,0,0,255)
                 render.clear()
                 cursorCol = 0
                 cursorRow = 0
-            of char(0x0D):      #reset cursor
-                cursorCol = 0
-                cursorRow = 0
-            of char(0x0E):      # decrement cursor
-                cursorCol -= 1
-            of char(0x0F):      # increment cursor
-                cursorCol += 1
             else:
                 for relativeX in 0..<charWidth:
                     for relativeY in 0..<charHeight:
@@ -91,7 +87,6 @@ proc characterIn(ch: char) =
         cursorCol = 0
     if cursorRow < 0: # negative reset
         cursorRow = 0
-    render.present()
     #echo "char: \'", ch, "\'"
 
 proc rand(x: float): uint8 = uint8( (pow(x, math.sqrt(x)) mod x) mod 256 )
@@ -107,9 +102,24 @@ while running:
             running = false
             break
     
-    characterIn('B')
-    characterIn('\b')
-    characterIn('\b')
+    # render.setDrawColor(0,0,0,255)
+    # render.clear()
+
+
+    i += 1
+    characterIn(char(rand(i*0.001)))
+
+
+    # i += 1
+    # if rand(i*0.000003) mod 2 == 0:
+    #     characterIn(0xDB.char())
+    #     #characterIn(rand(i*0.00031).char())
+    # else:
+    #     characterIn(0x00.char())
+
+    if int(i) mod (columns*rows) == 0:
+        render.present()
+
 
 # (((character mod 16)*9)+1, int(floor(character/16)*15)) is the expression for the starting point of a character in the font image
     

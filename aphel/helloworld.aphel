@@ -15,3 +15,4 @@ main:
     out 'd'
     out '!'
     out '\n'
+    hcf

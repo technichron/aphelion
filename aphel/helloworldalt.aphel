@@ -1,4 +1,3 @@
-
 @segment text
     global main
 
@@ -8,13 +7,13 @@ main:
 
     loop:
         mov $I A
-        cmp A, 0
+        cmp A, '\0'
         jez return
         out A
         jmp loop
         
     return:
-        halt
+        hcf
 
 
 

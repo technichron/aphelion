@@ -1,5 +1,5 @@
 
-INSTRUCTION SET                     opcode-hex opcode-binary argument-type
+BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
 
     nop - no instruction
         nop                         0x00 0b000000 NA
@@ -104,8 +104,6 @@ INSTRUCTION SET                     opcode-hex opcode-binary argument-type
     hcf                         halt and catch fire
         hcf                         0x3F 0b111111 NA
 
-MACRO SET
-
 SEGMENTATION
     
     " @segment text "
@@ -120,7 +118,7 @@ SEGMENTATION
             $0xA032 string "hello world!"
 
 
-    Supported data types:
+    Supported data types:   * these types only serve to tell the assembler how to embed the data into the image binary. It is not (as of yet) used to track how the data is used in the program.
         int8        8 bit unsigned integer
         sint8       8 bit signed integer
         int16       16 bit unsigned integer
