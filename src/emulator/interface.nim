@@ -98,8 +98,6 @@ proc rand(x: float): uint8 = uint8( (pow(x, math.sqrt(x)) mod x) mod 256 )
 
 
 var running = true
-var i = 1500000.0
-#i = 0.0
 while running:
 
     while pollEvent(event):
@@ -107,9 +105,8 @@ while running:
             running = false
             break
     
-    characterIn('B')
-    characterIn('\b')
-    characterIn('\b')
+    characterIn(0x01.char())
+    
 
 # (((character mod 16)*9)+1, int(floor(character/16)*15)) is the expression for the starting point of a character in the font image
     
