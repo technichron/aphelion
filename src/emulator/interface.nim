@@ -11,7 +11,9 @@ const charWidth = 8   # pixels
 const charScale = 2
 const controlCharsActive = true
 
-var window = createWindow("aphelion 2.1 terminal", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
+var window = createWindow("aphelion 2.0 terminal", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
+let icon = loadBMP("src/assets/icon.bmp")
+window.setIcon(icon)
 
 var event = sdl2.defaultEvent
 var render = createRenderer(window, -1, Renderer_Software)
@@ -21,18 +23,12 @@ var cursorCol = 0
 
 let fontImage = readImage("src/assets/3dfx8x14.png")
 
-proc drawpixel(x,y: int) =
-    # render.drawPoint(cint((x)+horizontalMargin),cint((y)+verticalMargin))
 
+
+proc drawpixel(x,y: int) =
     for xs in 1..charScale:
         for ys in 1..charScale:
             render.drawPoint(cint((x * charScale) - (xs-1) + horizontalMargin ),cint((y * charScale) - (ys-1) + verticalMargin ))
-
-    # render.drawPoint(cint((x*)-1+horizontalMargin),cint((y*2)-1+verticalMargin))
-    # render.drawPoint(cint((x*2)+horizontalMargin),cint((y*2)-1+verticalMargin))
-    # render.drawPoint(cint((x*2)+horizontalMargin),cint((y*2)+verticalMargin))
-    # render.drawPoint(cint((x*2)-1+horizontalMargin),cint((y*2)+verticalMargin))
-    #echo x, ", ", y
 
 proc characterIn(ch: char) =
     if controlCharsActive:
@@ -52,15 +48,15 @@ proc characterIn(ch: char) =
                         let pcolor = fontImage[1+relativeX, 0+relativeY]
                         render.setDrawColor(pcolor.r, pcolor.b, pcolor.g, pcolor.a)
                         drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
-            of char(0x03):      # clear screen
+            of char(0x0B):      # clear screen
                 render.setDrawColor(0,0,0,255)
                 render.clear()
-            of char(0x04):      # clear screen and reset cursor
-                render.setDrawColor(0,0,0,255)
-                render.clear()
+            of char(0x0C):      #reset cursor
                 cursorCol = 0
                 cursorRow = 0
-            of char(0x0D):      #reset cursor
+            of char(0x0D):      # clear screen and reset cursor
+                render.setDrawColor(0,0,0,255)
+                render.clear()
                 cursorCol = 0
                 cursorRow = 0
             of char(0x0E):      # decrement cursor
@@ -70,14 +66,14 @@ proc characterIn(ch: char) =
             else:
                 for relativeX in 0..<charWidth:
                     for relativeY in 0..<charHeight:
-                        let pcolor = fontImage[((int(ch) mod 16)*(charWidth+1))+1+relativeX, int(floor(int(ch)/16).int()*(charHeight+1))+relativeY]
+                        let pcolor = fontImage[((ch.int mod 16)*(charWidth+1))+1+relativeX, int((ch.int/16).floor.int*(charHeight+1))+relativeY]
                         render.setDrawColor(pcolor.r, pcolor.b, pcolor.g, pcolor.a)
                         drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
                 cursorCol += 1
     else:
         for relativeX in 0..<charWidth:
             for relativeY in 0..<charHeight:
-                let pcolor = fontImage[((int(ch) mod 16)*(charWidth+1))+1+relativeX, int(floor(int(ch)/16).int()*(charHeight+1))+relativeY]
+                let pcolor = fontImage[((int(ch) mod 16)*(charWidth+1))+1+relativeX, int((ch.int/16).floor.int*(charHeight+1))+relativeY]
                 render.setDrawColor(pcolor.r, pcolor.g, pcolor.b, pcolor.a)
                 drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
         cursorCol += 1
@@ -92,8 +88,6 @@ proc characterIn(ch: char) =
     if cursorRow < 0: # negative reset
         cursorRow = 0
     render.present()
-    #echo "char: \'", ch, "\'"
-
 
 var running = true
 while running:
@@ -102,9 +96,7 @@ while running:
         if event.kind == QuitEvent:
             running = false
             break
-    
-    characterIn(0x01.char())
-    
-
-# (((character mod 16)*9)+1, int(floor(character/16)*15)) is the expression for the starting point of a character in the font image
-    
+        if event.kind == KeyDown:
+            echo "key press"
+            echo event.key.keysym.sym
+            break

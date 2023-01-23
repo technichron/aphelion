@@ -1,5 +1,5 @@
 ╔══════════════════╗
-║ APHELION ISA 2.1 ║ by technichron
+║ APHELION ISA 2.0 ║ by technichron
 ╚══════════════════╝
 
 8-bit word length
@@ -54,6 +54,8 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
 
     nop                         no operation
     mov (src), (dest)           copy data from (src) to (dest)
+    out (op)                 †  put value out to stdout; simple alias for `mov (op), 0xFFFF`
+    in (reg)                 †  get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
     add (op1), (op2)            (op1) = (op1) + (op2)
     adc (op1), (op2)            (op1) = (op1) + (op2) + CARRY
     sub (op1), (op2)            (op1) = (op1) - (op2)
@@ -74,8 +76,6 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     asr (op), (amount)          arithmetic bit shift (op) right (amount) bits
     lsr (op), (amount)          logical bit shift (op) right (amount) bits
     hcf                         halt and catch fire
-    out (op)                 †  put value out to stdout; simple alias for `mov (op), 0xFFFF`
-    in (reg)                 †  get value out from stdout; simple alias for `mov 0xFFFF, (reg)`
     jez (loc)                †  jump to (loc) if ZERO is set
     jnz (loc)                †  jump to (loc) if ZERO is not set    * can also be called with 'jens'
     jeq (loc)                †  jump to (loc) if EQUAL is set

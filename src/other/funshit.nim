@@ -6,16 +6,16 @@ import sdl2
 import pixie
 import std/math
 
-let horizontalMargin = 5 # pixels
-let verticalMargin = 5   # pixels
-let columns = 80
-let rows = 25
-let charHeight = 14 # pixels
-let charWidth = 8   # pixels
-let charScale = 2
-let controlCharsActive = false
+const horizontalMargin = 5 # pixels
+const verticalMargin = 5   # pixels
+const columns = 80
+const rows = 25
+const charHeight = 14 # pixels
+const charWidth = 8   # pixels
+const charScale = 2
+const controlCharsActive = false
 
-var window = createWindow("aphelion 2.1 terminal", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
+var window = createWindow("h", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
 
 var event = sdl2.defaultEvent
 var render = createRenderer(window, -1, Renderer_Software)
@@ -26,17 +26,9 @@ var cursorCol = 0
 let fontImage = readImage("src/assets/3dfx8x14.png")
 
 proc drawpixel(x,y: int) =
-    # render.drawPoint(cint((x)+horizontalMargin),cint((y)+verticalMargin))
-
     for xs in 1..charScale:
         for ys in 1..charScale:
-            render.drawPoint(cint((x * charScale) - (xs-1) + horizontalMargin ),cint((y * charScale) - (ys-1) + verticalMargin ))
-
-    # render.drawPoint(cint((x*)-1+horizontalMargin),cint((y*2)-1+verticalMargin))
-    # render.drawPoint(cint((x*2)+horizontalMargin),cint((y*2)-1+verticalMargin))
-    # render.drawPoint(cint((x*2)+horizontalMargin),cint((y*2)+verticalMargin))
-    # render.drawPoint(cint((x*2)-1+horizontalMargin),cint((y*2)+verticalMargin))
-    #echo x, ", ", y
+            render.drawPoint(((x * charScale) - (xs-1) + horizontalMargin ).cint,((y * charScale) - (ys-1) + verticalMargin ).cint)
 
 proc characterIn(ch: char) =
     if controlCharsActive:
@@ -66,14 +58,14 @@ proc characterIn(ch: char) =
             else:
                 for relativeX in 0..<charWidth:
                     for relativeY in 0..<charHeight:
-                        let pcolor = fontImage[((int(ch) mod 16)*(charWidth+1))+1+relativeX, int(floor(int(ch)/16).int()*(charHeight+1))+relativeY]
+                        let pcolor = fontImage[((ch.int mod 16)*(charWidth+1))+1+relativeX, int((ch.int/16).floor.int*(charHeight+1))+relativeY]
                         render.setDrawColor(pcolor.r, pcolor.b, pcolor.g, pcolor.a)
                         drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
                 cursorCol += 1
     else:
         for relativeX in 0..<charWidth:
             for relativeY in 0..<charHeight:
-                let pcolor = fontImage[((int(ch) mod 16)*(charWidth+1))+1+relativeX, int(floor(int(ch)/16).int()*(charHeight+1))+relativeY]
+                let pcolor = fontImage[((int(ch) mod 16)*(charWidth+1))+1+relativeX, int((ch.int/16).floor.int*(charHeight+1))+relativeY]
                 render.setDrawColor(pcolor.r, pcolor.g, pcolor.b, pcolor.a)
                 drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
         cursorCol += 1
@@ -89,12 +81,13 @@ proc characterIn(ch: char) =
         cursorRow = 0
     #echo "char: \'", ch, "\'"
 
-proc rand(x: float): uint8 = uint8( (pow(x, math.sqrt(x)) mod x) mod 256 )
+proc rand(x: float): uint8 = ((pow(x, math.sqrt(x)) mod x) mod 150).uint8
 
 
 var running = true
 var i = 1500000.0
 #i = 0.0
+i = 4300000.0
 while running:
 
     while pollEvent(event):
@@ -106,16 +99,23 @@ while running:
     # render.clear()
 
 
-    i += 1
-    characterIn(char(rand(i*0.001)))
 
 
     # i += 1
-    # if rand(i*0.000003) mod 2 == 0:
-    #     characterIn(0xDB.char())
-    #     #characterIn(rand(i*0.00031).char())
-    # else:
-    #     characterIn(0x00.char())
+    # characterIn(char(rand(i*0.001)))
+
+
+
+
+    i += 1
+    if rand(i*0.000003) mod 2 == 0:
+        #characterIn(0xDB.char())
+        characterIn((rand(i*0.000004)+33).char())
+    else:
+        characterIn(0x00.char())
+
+
+
 
     if int(i) mod (columns*rows) == 0:
         render.present()
