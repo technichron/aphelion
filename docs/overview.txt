@@ -63,7 +63,7 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     jmp (loc)                 † set P to (loc)
     call (loc)                † set P to (loc) and set R to address of the following instruction
     jif (flags), (loc)          set P to (loc) if F & (flags) == (flags)
-    callif (flags), (loc)       set P to (loc) and set R to address of the following instruction if F & (flags) == (flags)
+    cif (flags), (loc)          set P to (loc) and set R to address of the following instruction if F & (flags) == (flags)
     ret                         set P to return pointer
     push (value)                push (value) onto stack         * most significant byte of int16 pushed first
     pop (dest)                  pop value from stack to (dest)

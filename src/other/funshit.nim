@@ -12,7 +12,7 @@ const columns = 80
 const rows = 25
 const charHeight = 14 # pixels
 const charWidth = 8   # pixels
-const charScale = 2
+const charScale = 1
 const controlCharsActive = false
 
 var window = createWindow("h", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display

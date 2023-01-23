@@ -44,9 +44,9 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         jif imm8, label/$imm16      0x1B 0b011011 BD
         jif imm8, $dreg             0x19 0b011001 RB
 
-    callif (flags), (loc)       set program counter to (loc) and set R to address of the following instruction if F & (flags) == (flags)
-        call imm8, label/$imm16     0x1C 0b011100 BD
-        call imm8, $dreg            0x1A 0b011010 RB
+    cif (flags), (loc)          set program counter to (loc) and set R to address of the following instruction if F & (flags) == (flags)
+        cif imm8, label/$imm16      0x1C 0b011100 BD
+        cif imm8, $dreg             0x1A 0b011010 RB
 
     ret                         set program counter to R
         ret                         0x1D 0b011101 NA
@@ -114,8 +114,11 @@ SEGMENTATION
 
         [address for first byte] [type] [actual data]
         
-        ex.! defining a string "hello world!" at $0xA032:
+        example - defining a string "hello world!" at $0xA032:
             $0xA032 string "hello world!"
+        
+        example - importing a file at path "./src/assets/3dfx8x14.png" at $0xD000:
+            $0xD000 file ./src/assets/3dfx8x14.png
 
 
     Supported data types:   * these types only serve to tell the assembler how to embed the data into the image binary. It is not (as of yet) used to track how the data is used in the program.
@@ -127,3 +130,4 @@ SEGMENTATION
         sint32      32 bit signed integer
         char        8 bit ascii character
         string      sequence of chars
+        file        file
