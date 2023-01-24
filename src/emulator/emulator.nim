@@ -200,12 +200,16 @@ while running:
         # add (op1), (op2)            (op1) = (op1) + (op2)
 
         of 0x09:    # add reg, reg                0x09 0b001001 RR
+            writeFlag(FlagCARRY, readRegister(IB[1]) > (readRegister(IB[1]) + readRegister(IB[2])) or readRegister(IB[2]) > (readRegister(IB[1]) + readRegister(IB[2])))
             writeRegister(readRegister(IB[1])+readRegister(IB[2]), IB[1])
         of 0x0a:    # add reg, imm8               0x0A 0b001010 RB
+            writeFlag(FlagCARRY, readRegister(IB[1]) > (readRegister(IB[1])+IB[2].uint8) or IB[2].uint8 > (readRegister(IB[1])+IB[2].uint8))
             writeRegister(readRegister(IB[1])+IB[2].uint8, IB[1])
         of 0x0b:    # add dreg, dreg              0x0B 0b001011 RR
+            writeFlag(FlagCARRY, readDoubleRegister(IB[1]) > (readDoubleRegister(IB[1]) + readDoubleRegister(IB[2])) or readDoubleRegister(IB[2]) > (readDoubleRegister(IB[1]) + readDoubleRegister(IB[2])))
             writeDoubleRegister(readDoubleRegister(IB[1])+readDoubleRegister(IB[2]), IB[1])
         of 0x0c:    # add dreg, imm16             0x0C 0b001100 RD
+            writeFlag(FlagCARRY, readDoubleRegister(IB[1]) > (readDoubleRegister(IB[1])+IB[2].uint16) or IB[2].uint16 > (readDoubleRegister(IB[1])+IB[2].uint16))
             writeDoubleRegister(readDoubleRegister(IB[1])+IB[2].uint16, IB[1])
 
         # adc (op1), (op2)            (op1) = (op1) + (op2) + CARRY
@@ -318,6 +322,13 @@ while running:
             writeRegister(bitnot(readRegister(IB[1])), IB[1])
         of 0x2d:    # not dreg                    0x2D 0b101101 RE
             writeDoubleRegister(bitnot(readDoubleRegister(IB[1])), IB[1])
+        
+        # cmp (op1), (op2)            compare (op1) and (op2), set relevant flags
+
+        of 0x2e:    # cmp reg, reg                0x2E 0b101110 RR
+            writeFlag(FlagGREATER, IB[1].uint8 > readRegister(IB[2]))
+            writeFlag(FlagLESS, IB[1].uint8 < readRegister(IB[2]))
+            writeFlag(FlagEQUAL, IB[1].uint8 == readRegister(IB[2]))
 
         else:
             echo "invalid opcode at $", $(readDoubleRegister(ProgramCounter)-getInstructionLength(opcode).uint16)
