@@ -264,7 +264,60 @@ while running:
         of 0x1d:    # ret                         0x1D 0b011101 NA
             writeDoubleRegister(readDoubleRegister(DRegR), ProgramCounter)
         
-        # push (value)                push (value) onto stack
+        # push (value)                push (value) onto stack         * stack pointer decrements, most significant byte of int16 pushed first
+
+        of 0x1e:    # push reg                    0x1E 0b011110 RE
+            writeDoubleRegister(readDoubleRegister(DRegS)-1, DRegS)
+            write(readRegister(IB[1]), readDoubleRegister(DRegS))
+        of 0x1f:    # push dreg                   0x1F 0b011111 RE
+            writeDoubleRegister(readDoubleRegister(DRegS)-2, DRegS)
+            write(readDoubleRegister(IB[1]).uint8+0b10000, readDoubleRegister(DRegS)+1)
+            write(readRegister(IB[1]), readDoubleRegister(DRegS))
+        of 0x20:    # push imm8                   0x20 0b100000 BY
+            writeDoubleRegister(readDoubleRegister(DRegS)-1, DRegS)
+            write(IB[1].uint8, readDoubleRegister(DRegS))
+        of 0x21:    # push imm16                  0x21 0b100001 DO
+            writeDoubleRegister(readDoubleRegister(DRegS)-2, DRegS)
+            write(IB[1].bitsliced(8..15).uint8, readDoubleRegister(DRegS)+1)
+            write(IB[1].bitsliced(0..7).uint8, readDoubleRegister(DRegS))
+        
+        # pop (dest)                  pop value from stack to (dest)  * stack pointer increments
+
+        of 0x22:    # pop reg                     0x22 0b100010 RE
+            writeRegister(read(readDoubleRegister(DregS)), IB[1])
+            writeDoubleRegister(readDoubleRegister(DRegS)+1, DRegS)
+        of 0x23:    # pop dreg                    0x23 0b100011 RE
+            writeDoubleRegister((read(readDoubleRegister(DregS)-1)*256+read(readDoubleRegister(DregS))).uint16, IB[1])
+            writeDoubleRegister(readDoubleRegister(DRegS)+2, DRegS)
+        
+        # and (op1), (op2)            (op1) = (op1) & (op2)
+
+        of 0x24:    # and reg, reg                0x24 0b100100 RR
+            writeRegister(bitand(readRegister(IB[1]),readRegister(IB[2])), IB[1])
+        of 0x25:    # and reg, imm8               0x25 0b100101 RB
+            writeRegister(bitand(readRegister(IB[1]),IB[2].uint8), IB[1])
+        of 0x26:    # and dreg, dreg              0x26 0b100110 RR
+            writeDoubleRegister(bitand(readDoubleRegister(IB[1]),readDoubleRegister(IB[2])), IB[1])
+        of 0x27:    # and dreg, imm16             0x27 0b100111 RD
+            writeDoubleRegister(bitand(readDoubleRegister(IB[1]),IB[2].uint16), IB[1])
+        
+        # or (op1), (op2)             (op1) = (op1) | (op2)
+
+        of 0x28:    # or reg, reg                 0x28 0b101000 RR
+            writeRegister(bitor(readRegister(IB[1]),readRegister(IB[2])), IB[1])
+        of 0x29:    # or reg, imm8                0x29 0b101001 RB
+            writeRegister(bitor(readRegister(IB[1]),IB[2].uint8), IB[1])
+        of 0x2a:    # or dreg, dreg               0x2A 0b101010 RR
+            writeDoubleRegister(bitor(readDoubleRegister(IB[1]),readDoubleRegister(IB[2])), IB[1])
+        of 0x2b:    # or dreg, imm16              0x2B 0b101011 RD
+            writeDoubleRegister(bitor(readDoubleRegister(IB[1]),IB[2].uint16), IB[1])
+        
+        # not (op)                    (op) = ! (op)
+
+        of 0x2c:    # not reg                     0x2C 0b101100 RE
+            writeRegister(bitnot(readRegister(IB[1])), IB[1])
+        of 0x2d:    # not dreg                    0x2D 0b101101 RE
+            writeDoubleRegister(bitnot(readDoubleRegister(IB[1])), IB[1])
 
         else:
             echo "invalid opcode at $", $(readDoubleRegister(ProgramCounter)-getInstructionLength(opcode).uint16)

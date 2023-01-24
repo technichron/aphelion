@@ -51,13 +51,13 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
     ret                         set program counter to R
         ret                         0x1D 0b011101 NA
 
-    push (value)                push (value) onto stack
+    push (value)                push (value) onto stack         * stack pointer decrements, most significant byte of int16 pushed first
         push reg                    0x1E 0b011110 RE
         push dreg                   0x1F 0b011111 RE
         push imm8                   0x20 0b100000 BY
         push imm16                  0x21 0b100001 DO
 
-    pop (dest)                  pop value from stack to (dest)
+    pop (dest)                  pop value from stack to (dest)  * stack pointer increments
         pop reg                     0x22 0b100010 RE
         pop dreg                    0x23 0b100011 RE
 

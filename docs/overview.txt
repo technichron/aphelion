@@ -65,8 +65,8 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     jif (flags), (loc)          set P to (loc) if F & (flags) == (flags)
     cif (flags), (loc)          set P to (loc) and set R to address of the following instruction if F & (flags) == (flags)
     ret                         set P to return pointer
-    push (value)                push (value) onto stack         * most significant byte of int16 pushed first
-    pop (dest)                  pop value from stack to (dest)
+    push (value)                push (value) onto stack         * stack pointer decrements, most significant byte of int16 pushed first
+    pop (dest)                  pop value from stack to (dest)  * stack pointer increments
     and (op1), (op2)            (op1) = (op1) & (op2)
     or (op1), (op2)             (op1) = (op1) | (op2)
     not (op)                    (op) = ! (op)
