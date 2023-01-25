@@ -84,12 +84,12 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         cmp dreg, imm16             0x31 0b110001 RD
     
     scmp (op1), (op2)           compare (op1) and (op2) as two's complement signed integers, set relevant flags
-        cmp reg, reg                0x32 0b110010 RR
-        cmp reg, imm8               0x33 0b110011 RB
-        cmp dreg, dreg              0x34 0b110100 RR
-        cmp dreg, imm16             0x35 0b110101 RD
+        scmp reg, reg               0x32 0b110010 RR
+        scmp reg, imm8              0x33 0b110011 RB
+        scmp dreg, dreg             0x34 0b110100 RR
+        scmp dreg, imm16            0x35 0b110101 RD
     
-    shl (op), (amount)          logical/arithmetic bit shift left (amount) bits     * can also be called with 'asl' and 'lsl'
+    shl (op), (amount)          logical/arithmetic bit shift (op) left (amount) bits     * can also be called with 'asl' and 'lsl'
         shl reg, imm8               0x36 0b110110 RB
         shl dreg, imm8              0x37 0b110111 RB
 

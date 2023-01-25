@@ -98,3 +98,4 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     jeans                    †  print ascii jeans to stdout     * funny
 
     † macro instructions - use '@setting base_only' in your assembly to disable these.
+
