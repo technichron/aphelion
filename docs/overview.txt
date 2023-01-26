@@ -23,7 +23,7 @@ REGISTERS (8-bit)
     0b00011  D  general
     0b00100  E  general
     0b00101  F  flags                               00[carry][borrow][greater][equal][less][zero]
-    0b00110  G  general   UNSAFE                  * reccomended for use w/ macro unpacking
+    0b00110  G  general   UNSAFE                  * recommended for use w/ macro unpacking
     0b01000  IL general - low  byte of I
     0b11000  IH general - high byte of I
     0b01001  JL general - low  byte of J
