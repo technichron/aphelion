@@ -118,10 +118,10 @@ SEGMENTATION
             $0xA032 string "hello world!"
         
         example - importing a file at path "./src/assets/3dfx8x14.png" at $0xD000:
-            $0xD000 file ./src/assets/3dfx8x14.png
+            $0xD000 file "./src/assets/3dfx8x14.png"
 
 
-    Supported data types:   * these types only serve to tell the assembler how to embed the data into the image binary. It is not (as of yet) used to track how the data is used in the program.
+    Supported data types:   * little endian
         int8        8 bit unsigned integer
         sint8       8 bit signed integer
         int16       16 bit unsigned integer
@@ -131,3 +131,6 @@ SEGMENTATION
         char        8 bit ascii character
         string      sequence of chars
         file        file
+    
+    these types only serve to tell the assembler how to embed the data into the image binary. 
+    It is not (as of yet) used to track how the data is used in the program.

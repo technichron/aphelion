@@ -6,17 +6,15 @@ main:
     mov 0x9000, I        # I is used as the pointer for the current character in the string
 
     loop:
-        mov $I A
+        mov $I, A
         cmp A, '\0'
         jez return
         out A
+        add I, 1
         jmp loop
         
     return:
         hcf
-
-
-
 
 @segment data
     $0x9000 string "hello world!\0"
