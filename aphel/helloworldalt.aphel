@@ -1,7 +1,6 @@
 @segment text
     global main
 
-
 main:
     mov 0x9000, I        # I is used as the pointer for the current character in the string
 
