@@ -1,0 +1,18 @@
+@segment text
+
+# default set of macros used by the assembler. use '@setting base_only' in your assembly to disable these.
+
+@macro out op
+	mov op, 0xFFFF
+
+@macro in reg
+	mov 0xFFFF, reg
+
+@macro jmp loc
+	mov loc, p
+
+@macro call loc
+	cif 0, loc
+
+@macro jez loc
+	jif 1, loc
