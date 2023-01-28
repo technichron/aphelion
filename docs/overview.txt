@@ -36,6 +36,10 @@ REGISTERS (8-bit)
     0b11100  SH stack pointer - high byte of S
     0b01101  RL return pointer - low  byte of R
     0b11101  RH return pointer - high byte of R
+    0b01110  XL general / function argument
+    0b11110  XH general / function argument
+    0b01111  YL general / function argument
+    0b11111  YH general / function argument
 
 
 
@@ -47,6 +51,8 @@ DOUBLE REGISTERS (16-bit)
     0b01011  P  program counter
     0b01100  S  stack pointer   * initialized to the top of ram, 0xFFF0
     0b01101  R  return pointer
+    0b01110  X  general / function argument
+    0b01111  Y  general / function argument
 
 
 
