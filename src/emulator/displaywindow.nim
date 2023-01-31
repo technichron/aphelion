@@ -51,11 +51,6 @@ proc charOut*(c: uint8) =
             of char(0x0C):      #reset cursor
                 cursorCol = 0
                 cursorRow = 0
-            of char(0x0D):      # clear screen and reset cursor
-                render.setDrawColor(0,0,0,255)
-                render.clear()
-                cursorCol = 0
-                cursorRow = 0
             of char(0x0E):      # decrement cursor
                 cursorCol -= 1
             of char(0x0F):      # increment cursor

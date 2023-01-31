@@ -108,7 +108,7 @@ proc writeFlag(code: uint8, value: bool) =
 
 # ----------------------------- time to run shit ----------------------------- #
 
-MemorySpace.loadAMG("amgs/aphelion.amg")
+MemorySpace.loadAMG("amgs/aphelion2test.amg")
 writeDoubleRegister(0x0FFF0, StackPointer)
 
 var running = true
