@@ -1,0 +1,15 @@
+@segment text
+global main
+main:
+mov 0x9000, I
+loop:
+mov $I, A
+cmp A, 92
+jez return
+out A
+add I, 1
+jmp loop
+return:
+hcf
+@segment data
+$0x9000 string "hello world!\0"

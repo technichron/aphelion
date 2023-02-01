@@ -6,7 +6,7 @@ main:
 
     loop:
         mov $I, A
-        cmp A, '\0'
+        cmp A, ''
         jez return
         out A
         add I, 1
