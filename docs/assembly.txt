@@ -106,22 +106,17 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
 
 SEGMENTATION
     
-    " @segment text "
+    @segment text
         defines a segment of assembly code. refer to the above for assembly syntax
     
-    " @segment data "
-        defines a segment of data.
+    @segment data
+        defines a segment of data in RAM space.
 
-        [address for first byte] [type] [actual data]
-        
-        example - defining a string "hello world!" at $0xA032:
-            $0xA032 string "hello world!"
-        
-        example - importing a file at path "./src/assets/3dfx8x14.png" at $0xD000:
-            $0xD000 file "./src/assets/3dfx8x14.png"
+    @segment rodata
+        defines a segment of data in ROM space.
 
 
-    Supported data types:   * little endian
+    supported data types:   * little endian
         int8        8 bit unsigned integer
         sint8       8 bit signed integer
         int16       16 bit unsigned integer

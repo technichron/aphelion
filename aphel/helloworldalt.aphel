@@ -1,12 +1,12 @@
 @segment text
-    global main
+    @global main
 
 main:
-    mov 0x9000, I        # I is used as the pointer for the current character in the string
+    mov str, I        # I is used as the pointer for the current character in the string
 
     loop:
         mov $I, A
-        cmp A, ''
+        cmp A, '\0'
         jez return
         out A
         add I, 1
@@ -16,4 +16,6 @@ main:
         hcf
 
 @segment data
-    $0x9000 string "hello world!\0"
+str: 
+    string "hello world!\0"
+    uint8 0x0A

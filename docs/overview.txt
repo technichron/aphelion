@@ -103,5 +103,5 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     xnor (op1), (op2)        †  (op1) = ! ((op1) ⊕ (op2))
     jeans                    †  print ascii jeans to stdout     * funny
 
-    † macro instructions - use '@setting base_only' in your assembly to disable these.
+    † macro instructions - use "@setting use_default_macros false" in your assembly to disable these.
 
