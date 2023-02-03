@@ -13,5 +13,5 @@ return:
 hcf
 @segment data
 str:
-string "hello world!\0"
+string hello\_world!\0
 uint8 10

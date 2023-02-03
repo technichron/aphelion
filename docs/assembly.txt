@@ -127,5 +127,5 @@ SEGMENTATION
         string      sequence of chars
         file        file
     
-    these types only serve to tell the assembler how to embed the data into the image binary. 
+    these types only serve to tell the assembler how to allocate memory and embed the data into the image binary. 
     It is not (as of yet) used to track how the data is used in the program.

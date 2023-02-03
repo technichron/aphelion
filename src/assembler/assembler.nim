@@ -66,7 +66,14 @@ proc decify(file: string): string = # turns all integer types and characters int
             except:
                 echo num
                 error("Invalid Argument", "[" & $l & "] invalid octal integer: " & num)
-
+        if find(lines[l], '\"') != -1:
+            var str = ""
+            try:
+                str = lines[l][find(lines[l], '\"')..find(lines[l], '\"', find(lines[l], '\"')+1)]
+                lines[l] = lines[l].replace(str, str.replace(" ", "\\_").strip(chars = {'\'', '\"'})) #\_ is escape code for space
+            except:
+                str = lines[l][find(lines[l], '\"')..find(lines[l], Whitespace, find(lines[l], '\"')+1)]
+                error("Invalid Argument", "[" & $l & "] invalid string: " & str)
     
     for l in 0..lines.high():
         result.add lines[l] & "\n"
