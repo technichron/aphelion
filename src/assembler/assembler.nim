@@ -5,9 +5,14 @@
 
 import std/strutils, std/sequtils, std/terminal, std/tables, codepage
 
-var IL: seq[array[4, string]] # [label, opcode, arg1, arg2]
+var IList: seq[array[4, string]] # [label, opcode, arg1, arg2]
 
 var SymbolTable: seq[array[2, string]]
+
+proc `$`(s: seq[array[4, string]]): string =
+    for element in s:
+        result.add $element
+        result.add "\n"
 
 proc error(errortype, message: string) =
     styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message
@@ -29,8 +34,9 @@ proc clean(file: string): string = # does exactly what it sounds like it does: c
     
     lines = lines.filterIt(it.len() != 0)
 
-    for l in 0..lines.high():
-        result.add lines[l] & "\n"
+    for l in 0..lines.high:
+        result.add lines[l]
+        if l < lines.high: result.add "\n"
 
 proc decify(file: string): string = # turns all integer types and characters into decimal values for easier parsing later
     var lines = file.splitLines(true)
@@ -75,11 +81,40 @@ proc decify(file: string): string = # turns all integer types and characters int
                 str = lines[l][find(lines[l], '\"')..find(lines[l], Whitespace, find(lines[l], '\"')+1)]
                 error("Invalid Argument", "[" & $l & "] invalid string: " & str)
     
-    for l in 0..lines.high():
-        result.add lines[l] & "\n"
+    for l in 0..lines.high:
+        result.add lines[l]
+        if l < lines.high: result.add "\n"
+
 
 proc populate(il: var seq[array[4, string]], assemblyfile: string, symtable: var seq[array[2, string]]) =
-    discard
+    
+    IList.add ["","","",""]
+    
+    var l = 0
+    for currentLine in assemblyfile.splitLines:
+        l += 1
+        if currentLine.endsWith(':'):
+            IList[IList.high][0] = currentLine[0..currentLine.high-1]
+        else:
+            case currentLine.split.len
+            of 1:
+                IList[IList.high][1] = currentLine.split[0]
+            of 2:
+                IList[IList.high][1] = currentLine.split[0]
+                IList[IList.high][2] = currentLine.split[1]
+            of 3:
+                IList[IList.high][1] = currentLine.split[0]
+                IList[IList.high][2] = currentLine.split[1]
+                IList[IList.high][3] = currentLine.split[2]
+            else:
+                error("Invalid Instruction", "[" & $l & "] invalid argument length : " & currentLine)
+            if l != assemblyfile.splitLines.len: IList.add ["","","",""]
+    
+    echo IList
+            
+
+
+        
 
 
 # ------------------------------------------------------------------------- #
@@ -88,5 +123,5 @@ proc populate(il: var seq[array[4, string]], assemblyfile: string, symtable: var
 var aphelFile = readFile("./aphel/helloworldalt.aphel")
 aphelFile = aphelFile.decify()
 aphelFile = aphelFile.clean()
-IL.populate(aphelFile, SymbolTable)
+IList.populate(aphelFile, SymbolTable)
 writeFile("./src/assembler/bruh.txt", aphelFile)
