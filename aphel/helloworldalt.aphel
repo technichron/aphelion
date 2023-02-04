@@ -1,21 +1,18 @@
 @segment text
     @global main
 
-main:
-    mov str, I        # I is used as the pointer for the current character in the string
+main: mov str, I        # I is used as the pointer for the current character in the string
 
     loop:
         mov $I, A
         cmp A, '\0'
-        jez return
-        out A
+        jif 1, return
+        mov A, 0xffff
         add I, 1
         jmp loop
         
     return:
         hcf
 
-@segment data
-str: 
-    string "hello world!\0"
-    uint8 0x0A
+@segment rodata
+    str: string "hello world!\0"

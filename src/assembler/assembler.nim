@@ -23,7 +23,7 @@ proc clean(file: string): string = # does exactly what it sounds like it does: c
 
 
     for l in 0..lines.high():
-        lines[l] = lines[l].strip()
+        lines[l] = lines[l].strip
         if lines[l] != "":
             if lines[l][0] == '#':
                 lines[l] = ""
@@ -42,6 +42,7 @@ proc decify(file: string): string = # turns all integer types and characters int
     var lines = file.splitLines(true)
 
     for l in 0..lines.high():
+        lines[l] = lines[l].strip
         lines[l].add(" ")
         if find(lines[l], '\'') != -1:
             let character =  lines[l][find(lines[l], '\'')..find(lines[l], '\'', find(lines[l], '\'')+1)]
@@ -80,13 +81,17 @@ proc decify(file: string): string = # turns all integer types and characters int
             except:
                 str = lines[l][find(lines[l], '\"')..find(lines[l], Whitespace, find(lines[l], '\"')+1)]
                 error("Invalid Argument", "[" & $l & "] invalid string: " & str)
+        if lines[l].split[0].endsWith(':') and lines[l].split.len > 1:
+            var line = lines[l].split
+            line[0].add "\n"
+            lines[l] = line.join(" ")
     
     for l in 0..lines.high:
         result.add lines[l]
         if l < lines.high: result.add "\n"
 
 
-proc populate(il: var seq[array[4, string]], assemblyfile: string, symtable: var seq[array[2, string]]) =
+proc populate(assemblyfile: string, symtable: var seq[array[2, string]]) =
     
     IList.add ["","","",""]
     
@@ -96,26 +101,15 @@ proc populate(il: var seq[array[4, string]], assemblyfile: string, symtable: var
         if currentLine.endsWith(':'):
             IList[IList.high][0] = currentLine[0..currentLine.high-1]
         else:
-            case currentLine.split.len
-            of 1:
-                IList[IList.high][1] = currentLine.split[0]
-            of 2:
-                IList[IList.high][1] = currentLine.split[0]
-                IList[IList.high][2] = currentLine.split[1]
-            of 3:
-                IList[IList.high][1] = currentLine.split[0]
-                IList[IList.high][2] = currentLine.split[1]
-                IList[IList.high][3] = currentLine.split[2]
+            if currentLine.split.len <= 3:
+                for i in 1..currentLine.split.len:
+                    IList[IList.high][i] = currentLine.split[i-1]
             else:
-                error("Invalid Instruction", "[" & $l & "] invalid argument length : " & currentLine)
+                error("Invalid Instruction", "[" & $l & "] invalid argument number : " & currentLine)
             if l != assemblyfile.splitLines.len: IList.add ["","","",""]
     
-    echo IList
-            
-
-
-        
-
+    
+# proc flattenOpcodes(var)
 
 # ------------------------------------------------------------------------- #
 
@@ -123,5 +117,5 @@ proc populate(il: var seq[array[4, string]], assemblyfile: string, symtable: var
 var aphelFile = readFile("./aphel/helloworldalt.aphel")
 aphelFile = aphelFile.decify()
 aphelFile = aphelFile.clean()
-IList.populate(aphelFile, SymbolTable)
-writeFile("./src/assembler/bruh.txt", aphelFile)
+populate(aphelFile, SymbolTable)
+writeFile("./src/assembler/bruh.txt", $IList)
