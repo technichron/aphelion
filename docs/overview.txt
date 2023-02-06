@@ -17,42 +17,42 @@ MEMORY
 
 REGISTERS (8-bit)
 
-    0b00000  A  general
-    0b00001  B  general
-    0b00010  C  general
-    0b00011  D  general
-    0b00100  E  general
-    0b00101  F  flags                               00[carry][borrow][greater][equal][less][zero]
-    0b00110  G  general   UNSAFE                  * recommended for use w/ macro unpacking
-    0b01000  IL general - low  byte of I
-    0b11000  IH general - high byte of I
-    0b01001  JL general - low  byte of J
-    0b11001  JH general - high byte of J
-    0b01010  KL general - low  byte of K
-    0b11010  KH general - high byte of K
-    0b01011  PL program counter - low  byte of P
-    0b11011  PH program counter - high byte of P
-    0b01100  SL stack pointer - low  byte of S
-    0b11100  SH stack pointer - high byte of S
-    0b01101  RL return pointer - low  byte of R
-    0b11101  RH return pointer - high byte of R
-    0b01110  XL general / function argument
-    0b11110  XH general / function argument
-    0b01111  YL general / function argument
-    0b11111  YH general / function argument
-
+    0x00  A  general
+    0x01  B  general
+    0x02  C  general
+    0x03  D  general
+    0x04  E  general
+    0x05  F  flags                               00[carry][borrow][greater][equal][less][zero]
+    0x06  G  general   UNSAFE                  * recommended for use w/ macro unpacking
+    0x08  IL general - low  byte of I
+    0x18  IH general - high byte of I
+    0x09  JL general - low  byte of J
+    0x19  JH general - high byte of J
+    0x0A  KL general - low  byte of K
+    0x1A  KH general - high byte of K
+    0x0B  PL program counter - low  byte of P
+    0x1B  PH program counter - high byte of P
+    0x0C  SL stack pointer - low  byte of S
+    0x1C  SH stack pointer - high byte of S
+    0x0D  RL return pointer - low  byte of R
+    0x1D  RH return pointer - high byte of R
+    0x0E  XL general / function argument - low  byte of X
+    0x1E  XH general / function argument - high byte of X
+    0x0F  YL general / function argument - low  byte of Y
+    0x1F  YH general / function argument - high byte of Y
+ 
 
 
 DOUBLE REGISTERS (16-bit)
 
-    0b01000  I  general
-    0b01001  J  general
-    0b01010  K  general
-    0b01011  P  program counter
-    0b01100  S  stack pointer   * initialized to the top of ram, 0xFFF0
-    0b01101  R  return pointer
-    0b01110  X  general / function argument
-    0b01111  Y  general / function argument
+    0x08  I  general
+    0x09  J  general
+    0x0A  K  general
+    0x0B  P  program counter
+    0x0C  S  stack pointer   * initialized to the top of ram, 0xFFF0
+    0x0D  R  return pointer
+    0x0E  X  general / function argument
+    0x0F  Y  general / function argument
 
 
 
@@ -103,5 +103,5 @@ INSTRUCTIONS    * this is an overview. see 'assembly.txt' for a comprehensive re
     xnor (op1), (op2)        †  (op1) = ! ((op1) ⊕ (op2))
     jeans                    †  print ascii jeans to stdout     * funny
 
-    † macro instructions - use "@setting use_default_macros false" in your assembly to disable these.
+    † macro instructions
 

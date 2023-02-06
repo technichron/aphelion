@@ -109,11 +109,11 @@ SEGMENTATION
     @segment text
         defines a segment of assembly code. refer to the above for assembly syntax
     
-    @segment data
-        defines a segment of data in RAM space.
-
     @segment rodata
         defines a segment of data in ROM space.
+
+    @segment data
+        defines a segment of data in RAM space.
 
 
     supported data types:   * little endian

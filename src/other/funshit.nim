@@ -1,19 +1,20 @@
 
-# this is just fun shit made with "interface.nim". not intended for use in the final emulator.
+# this is just fun shit made with "displaywindow.nim". not intended for use in the final emulator.
 
 
 import sdl2
 import pixie
 import std/math
 
-const horizontalMargin = 5 # pixels
-const verticalMargin = 5   # pixels
-const columns = 80
+const horizontalMargin = 1 # pixels
+const verticalMargin = 1   # pixels
+const columns = 50
 const rows = 25
 const charHeight = 14 # pixels
 const charWidth = 8   # pixels
-const charScale = 1
-const controlCharsActive = false
+const charScale = 2
+const controlCharsActive = true
+const invert = true
 
 var window = createWindow("h", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
 
@@ -24,6 +25,18 @@ var cursorRow = 0
 var cursorCol = 0
 
 let fontImage = readImage("src/assets/3dfx8x14.png")
+
+proc setcolor(color: ColorRGBX) =
+    if invert:
+        render.setDrawColor(255-color.r, 255-color.g, 255-color.b, 255-color.a)
+    else:
+        render.setDrawColor(color.r, color.g, color.b, color.a)
+
+proc setcolor(r,g,b,a: uint8) =
+    if invert:
+        render.setDrawColor(255-r, 255-g, 255-b, 255-a)
+    else:
+        render.setDrawColor(r, g, b, a)
 
 proc drawpixel(x,y: int) =
     for xs in 1..charScale:
@@ -45,13 +58,13 @@ proc characterIn(ch: char) =
                 for relativeX in 0..<charWidth:
                     for relativeY in 0..<charHeight:
                         let pcolor = fontImage[1+relativeX, 0+relativeY]
-                        render.setDrawColor(pcolor.r, pcolor.b, pcolor.g, pcolor.a)
+                        setcolor(pcolor)
                         drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
             of char(0x03):
-                render.setDrawColor(0,0,0,255)
+                setcolor(0,0,0,255)
                 render.clear()
             of char(0x04):
-                render.setDrawColor(0,0,0,255)
+                setcolor(0,0,0,255)
                 render.clear()
                 cursorCol = 0
                 cursorRow = 0
@@ -59,14 +72,14 @@ proc characterIn(ch: char) =
                 for relativeX in 0..<charWidth:
                     for relativeY in 0..<charHeight:
                         let pcolor = fontImage[((ch.int mod 16)*(charWidth+1))+1+relativeX, int((ch.int/16).floor.int*(charHeight+1))+relativeY]
-                        render.setDrawColor(pcolor.r, pcolor.b, pcolor.g, pcolor.a)
+                        setcolor(pcolor)
                         drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
                 cursorCol += 1
     else:
         for relativeX in 0..<charWidth:
             for relativeY in 0..<charHeight:
                 let pcolor = fontImage[((int(ch) mod 16)*(charWidth+1))+1+relativeX, int((ch.int/16).floor.int*(charHeight+1))+relativeY]
-                render.setDrawColor(pcolor.r, pcolor.g, pcolor.b, pcolor.a)
+                setcolor(pcolor)
                 drawpixel((cursorCol*charWidth)+relativeX, (cursorRow*charHeight)+relativeY)
         cursorCol += 1
     if cursorCol == columns: # line wrapping
@@ -86,8 +99,8 @@ proc rand(x: float): uint8 = ((pow(x, math.sqrt(x)) mod x) mod 150).uint8
 
 var running = true
 var i = 1500000.0
-#i = 0.0
-i = 4300000.0
+i = 0.0
+#i = 4300000.0
 while running:
 
     while pollEvent(event):
@@ -101,18 +114,18 @@ while running:
 
 
 
-    # i += 1
-    # characterIn(char(rand(i*0.001)))
-
-
-
-
     i += 1
-    if rand(i*0.000003) mod 2 == 0:
-        #characterIn(0xDB.char())
-        characterIn((rand(i*0.000004)+33).char())
-    else:
-        characterIn(0x00.char())
+    characterIn(char(rand(i*0.0001)))
+
+
+
+
+    # i += 1
+    # if rand(i*0.000002) mod 2 == 0:
+    #     #characterIn(0xDB.char())
+    #     characterIn((rand(i*0.000004)+33).char())
+    # else:
+    #     characterIn(0x00.char())
 
 
 

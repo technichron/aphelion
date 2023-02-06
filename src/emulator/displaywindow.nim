@@ -30,11 +30,11 @@ proc charOut*(c: uint8) =
     let ch = c.char
     if controlCharsActive:
         case ch
-            of '\0': discard
-            of '\n':
+            of char(0x00): discard
+            of char(0x0A):
                 cursorCol = 0
                 cursorRow += 1
-            of '\b':
+            of char(0x08):      # backspace
                 if cursorCol == 0:
                     cursorCol = columns
                     cursorRow -= 1
@@ -55,6 +55,8 @@ proc charOut*(c: uint8) =
                 cursorCol -= 1
             of char(0x0F):      # increment cursor
                 cursorCol += 1
+            of char(0xFF):      # beep
+                discard # get working
             else:
                 for relativeX in 0..<charWidth:
                     for relativeY in 0..<charHeight:
