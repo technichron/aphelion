@@ -5,9 +5,9 @@
 @define asciiend, 'Z'
 
 main:
-    mov asciistart, a
+    mov asciistart, rA
 
-    cmp a, asciiend
+    cmp rA, asciiend
     jle loop
 
     invalidrange:
@@ -29,8 +29,8 @@ main:
         hcf
 
     loop:
-        out a
-        add a, 1
-        cmp a, asciiend
+        out rA
+        add rA, 1
+        cmp rA, asciiend
         jmp loop
         hcf

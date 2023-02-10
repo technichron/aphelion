@@ -3,10 +3,10 @@
 # ║ APHELION EMULATOR 2.0 ║
 # ╚═══════════════════════╝
 
-import std/strutils, std/bitops, std/os, std/math, pixie, sdl2
+import std/strutils, std/bitops, std/os, std/math, std/terminal, std/parseopt, pixie, sdl2
 import displaywindow
 
-const Flags  = 0b00101          # flags                               00[carry][borrow][greater][equal][less][zero]
+const Flags  = 0b00101          # 00[carry][borrow][greater][equal][less][zero]
 
 const StackPointer = 0b01100    # stack pointer   * initialized to the top of ram, 0xFFF0
 const ReturnPointer = 0b01101   # return pointer
@@ -24,18 +24,88 @@ var Registers: array[30, uint8]
 var BIB: array[5, uint8]        # binary instruction buffer - for reading bytes straight from the file
 var IB: array[3, int]           # (clean) instruction buffer - [opcode, arg1, arg2]
 
+var BinaryPath = ""
+var IgnoreAMGLength = false
+var EchoIns = false
+
+proc error(errortype, message: string) =
+    styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message
+    quit(0)
+
+# proc success(successtype, message: string) =
+#     styledEcho styleDim, fgGreen, successtype, ":", fgDefault, styleDim, " ", message
+
+proc loadCMDLineArguments() = 
+    var p = initOptParser(commandLineParams().join(" "))
+    while true:
+        p.next()
+        case p.kind
+            of cmdEnd:
+                break
+            of cmdLongOption:
+                if p.key == "echo-instructions" and p.val == "true":
+                    EchoIns = true
+                if p.key == "ignore-amg-length" and p.val == "true":
+                    IgnoreAMGLength = true
+            of cmdArgument:
+                 BinaryPath = p.key
+            else: discard
+
+
+proc debugPrint(b: bool, str: string) =
+    if b: echo str
+
+proc regName(i: int): string =
+    case i
+    of 0x00: return "rA"
+    of 0x01: return "rB"
+    of 0x02: return "rC"
+    of 0x03: return "rD"
+    of 0x04: return "rE"
+    of 0x05: return "rF"
+    of 0x06: return "rGL"
+    of 0x16: return "rGH"
+    of 0x08: return "rIL"
+    of 0x18: return "rIH"
+    of 0x09: return "rJL"
+    of 0x19: return "rJH"
+    of 0x0A: return "rKL"
+    of 0x1A: return "rKH"
+    of 0x0B: return "rPL"
+    of 0x1B: return "rPH"
+    of 0x0C: return "rSL"
+    of 0x1C: return "rSH"
+    of 0x0D: return "rRL"
+    of 0x1D: return "rRH"
+    of 0x0E: return "rXL"
+    of 0x1E: return "rXH"
+    of 0x0F: return "rYL"
+    of 0x1F: return "rYH"
+    else: return ""
+
+proc dregName(i: int): string =
+    case i
+    of 0x06: return "rG"
+    of 0x08: return "rI"
+    of 0x09: return "rJ"
+    of 0x0A: return "rK"
+    of 0x0B: return "rP"
+    of 0x0C: return "rS"
+    of 0x0D: return "rR"
+    of 0x0E: return "rX"
+    of 0x0F: return "rY"
+    else: return ""
+
 proc loadAMG(memarray: var array[0x10000, uint8], path: string) =
     try:
         let amg = readFile(path)
-        if amg.len() == 0x10000:
-            for index in 0..0xffff:
+        if amg.len() == 0x10000 or IgnoreAMGLength:
+            for index in 0..min(amg.len(),0xffff):
                 memarray[index] = uint8(amg[index])
-            echo "\"", path, "\"", " loaded successfully"
         else:
-            echo "\"", path, "\"", ": expected 65536 bytes, got ", len(amg), " bytes"
+                error("Error", "\"" & path & "\"" & ": expected 65536 bytes, got " & $len(amg) & " bytes")
     except IOError:
-        echo "could not open ", "\"", path, "\""
-        quit(0)
+        error("Error", "could not open " & "\"" & path & "\"")
 
 proc getInstructionFormat(opcode: uint8): string =
     case opcode
@@ -86,17 +156,30 @@ proc write(value: uint8, address: SomeInteger) =
         charOut(value)
 
 proc readRegister(code: int): uint8 =
-    return Registers[code]
+    try:
+        return Registers[code]
+    except IndexDefect:
+        error("Error", "invalid register read")
+
 
 proc writeRegister(value: uint8, code: int) =
-    Registers[code] = value
+    try:
+        Registers[code] = value
+    except IndexDefect:
+        error("Error", "invalid register write")
 
 proc readDoubleRegister(code: int): uint16 =
-    return uint16(Registers[code+16]*256 + Registers[code])
+    try:
+        return uint16(Registers[code+16]*256 + Registers[code])
+    except IndexDefect:
+        error("Error", "invalid register read")
 
 proc writeDoubleRegister(value: uint16, code:int) =
-    Registers[code] = uint8(value.bitsliced(0..7))
-    Registers[code+16] = uint8(value.bitsliced(8..15))
+    try:
+        Registers[code] = uint8(value.bitsliced(0..7))
+        Registers[code+16] = uint8(value.bitsliced(8..15))
+    except IndexDefect:
+        error("Error", "invalid register write")
 
 proc readFlag(code: uint8): bool = bitand(code, Registers[Flags]).bool
 
@@ -108,7 +191,9 @@ proc writeFlag(code: uint8, value: bool) =
 
 # ----------------------------- time to run shit ----------------------------- #
 
-MemorySpace.loadAMG("amgs/aphelion2test.amg")
+loadCMDLineArguments()
+
+MemorySpace.loadAMG(BinaryPath)
 writeDoubleRegister(0x0FFF0, StackPointer)
 
 var running = true
@@ -155,35 +240,46 @@ while running:
             IB[1] = ((BIB[2]*256)+BIB[1]).int
             IB[2] = ((BIB[4]*256)+BIB[3]).int
     
+    let CIL = readDoubleRegister(ProgramCounter)
     writeDoubleRegister(readDoubleRegister(ProgramCounter)+getInstructionLength(opcode).uint16, ProgramCounter)
 
     case IB[0]
-
         of 0x00:    # nop                         0x00 0b000000 NA
+            EchoIns.debugPrint(toHex(CIL,4) & " | nop")
             discard
 
         # mov (src), (dest)           copy data from (src) to (dest)
 
         of 0x01:    # mov reg, $imm16             0x01 0b000001 RD
             write(readRegister(IB[1]), IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov " & regName(IB[1]) & " $" & toHex(IB[2],4))
         of 0x02:    # mov reg, reg                0x02 0b000010 RR
             writeRegister(readRegister(IB[1]), IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov " & regName(IB[1]) & " " & regName(IB[2]))
         of 0x03:    # mov dreg, dreg              0x03 0b000011 RR
             writeDoubleRegister(readDoubleRegister(IB[1]), IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov " & dregName(IB[1]) & " " & dregName(IB[2]))
         of 0x04:    # mov imm8, reg               0x04 0b000100 RB
             writeRegister(IB[1].uint8, IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov" & $IB[1] & " " & regName(IB[2])) 
         of 0x05:    # mov imm8, $imm16            0x05 0b000101 BD
             write(IB[1].uint8, IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov " & $IB[1] & " $" & toHex(IB[2],4))
         of 0x06:    # mov imm16, dreg             0x06 0b000110 RD
             writeDoubleRegister(IB[2].uint16, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov " & $IB[2] & " " & dregName(IB[1]))
         of 0x07:    # mov $imm16, reg             0x07 0b000111 RD
             writeRegister(read(IB[2]), IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov $" & toHex(IB[2],4) & " " & regName(IB[1]))
         of 0x08:    # mov $imm16, $imm16          0x08 0b001000 DD
             write(read(IB[1]), IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov $" & toHex(IB[1],4) & " $" & toHex(IB[2],4))
         of 0x3c:    # mov $dreg, $imm16           0x3C 0b001000 RD
             write(read(readDoubleRegister(IB[1])), IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov $" & dregName(IB[1]) & " $" & toHex(IB[2],4))
         of 0x3d:    # mov $dreg, dreg             0x3D 0b001000 RR
             writeDoubleRegister(read(readDoubleRegister(IB[1])), IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " | mov $" & dregName(IB[1]) & " $" & dregName(IB[2]))
 
         # add (op1), (op2)            (op1) = (op1) + (op2)
 
@@ -191,18 +287,22 @@ while running:
             let sum = readRegister(IB[1])+readRegister(IB[2])
             writeFlag(FlagCARRY, readRegister(IB[1]) > sum or readRegister(IB[2]) > sum)
             writeRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | add " & regName(IB[1]) & " " & regName(IB[2]))
         of 0x0a:    # add reg, imm8               0x0A 0b001010 RB
             let sum = readRegister(IB[1])+IB[2].uint8
             writeFlag(FlagCARRY, readRegister(IB[1]) > sum or IB[2].uint8 > sum)
             writeRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | add " & regName(IB[1]) & " " & $IB[2])
         of 0x0b:    # add dreg, dreg              0x0B 0b001011 RR
             let sum = readDoubleRegister(IB[1])+readDoubleRegister(IB[2])
             writeFlag(FlagCARRY, readDoubleRegister(IB[1]) > sum or readDoubleRegister(IB[2]) > sum)
             writeDoubleRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | add " & dregName(IB[1]) & " " & dregName(IB[2]))
         of 0x0c:    # add dreg, imm16             0x0C 0b001100 RD
             let sum = readDoubleRegister(IB[1])+IB[2].uint16
             writeFlag(FlagCARRY, readDoubleRegister(IB[1]) > sum or IB[2].uint16 > sum)
             writeDoubleRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | add " & dregName(IB[1]) & " " & $IB[2])
 
         # adc (op1), (op2)            (op1) = (op1) + (op2) + CARRY
     
@@ -210,18 +310,22 @@ while running:
             let sum = readRegister(IB[1])+readRegister(IB[2])+readFlag(FlagCARRY).uint8
             writeFlag(FlagCARRY, readRegister(IB[1]) > sum or readRegister(IB[2]) > sum or readFlag(FlagCARRY).uint8 > sum)
             writeRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | adc " & regName(IB[1]) & " " & regName(IB[2]))
         of 0x0e:    # adc reg, imm8               0x0E 0b001110 RB
             let sum = readRegister(IB[1])+IB[2].uint8+readFlag(FlagCARRY).uint8
             writeFlag(FlagCARRY, readRegister(IB[1]) > sum or IB[2].uint8 > sum or readFlag(FlagCARRY).uint8 > sum)
             writeRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | adc " & regName(IB[1]) & " " & $IB[2])
         of 0x0f:    # adc dreg, dreg              0x0F 0b001111 RR
             let sum = readDoubleRegister(IB[1])+readDoubleRegister(IB[2])+readFlag(FlagCARRY).uint16
             writeFlag(FlagCARRY, readDoubleRegister(IB[1]) > sum or readDoubleRegister(IB[2]) > sum or readFlag(FlagCARRY).uint16 > sum)
             writeDoubleRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | adc " & dregName(IB[1]) & " " & dregName(IB[2]))
         of 0x10:    # adc dreg, imm16             0x10 0b010000 RD
             let sum = readDoubleRegister(IB[1])+IB[2].uint16+readFlag(FlagCARRY).uint16
             writeFlag(FlagCARRY, readDoubleRegister(IB[1]) > sum or IB[2].uint16 > sum or readFlag(FlagCARRY).uint16 > sum)
             writeDoubleRegister(sum, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | adc " & dregName(IB[1]) & " " & $IB[2])
 
         
         # sub (op1), (op2)            (op1) = (op1) - (op2)
@@ -230,18 +334,22 @@ while running:
             let dif = readRegister(IB[1])-readRegister(IB[2])
             writeFlag(FlagBORROW, readRegister(IB[1]) < dif or readRegister(IB[2]) < dif)
             writeRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sub " & regName(IB[1]) & " " & regName(IB[2]))
         of 0x12:    # sub reg, imm8               0x12 0b010010 RB
             let dif = readRegister(IB[1])-IB[2].uint8
             writeFlag(FlagBORROW, readRegister(IB[1]) < dif or IB[2].uint8 < dif)
             writeRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sub " & regName(IB[1]) & " " & $IB[2])
         of 0x13:    # sub dreg, dreg              0x13 0b010011 RR
             let dif = readDoubleRegister(IB[1])-readDoubleRegister(IB[2])
             writeFlag(FlagBORROW, readDoubleRegister(IB[1]) < dif or readDoubleRegister(IB[2]) < dif)
             writeDoubleRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sub " & dregName(IB[1]) & " " & dregName(IB[2]))
         of 0x14:    # sub dreg, imm16             0x14 0b010100 RD
             let dif = readDoubleRegister(IB[1])-IB[2].uint16
             writeFlag(FlagBORROW, readDoubleRegister(IB[1]) < dif or IB[2].uint16 < dif)
             writeDoubleRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sub " & dregName(IB[1]) & " " & $IB[2])
         
         # sbb (op1), (op2)            (op1) = (op1) - (op2) - BORROW
     
@@ -249,25 +357,31 @@ while running:
             let dif = readRegister(IB[1])-readRegister(IB[2])-readFlag(FlagBORROW).uint8
             writeFlag(FlagBORROW, readRegister(IB[1]) < dif or (readRegister(IB[2])+readFlag(FlagBORROW).uint8) < dif)
             writeRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sbb " & regName(IB[1]) & " " & regName(IB[2]))
         of 0x16:    # sbb reg, imm8               0x16 0b010110 RB
             let dif = readRegister(IB[1])-IB[2].uint8-readFlag(FlagBORROW).uint8
             writeFlag(FlagBORROW, readRegister(IB[1]) < dif or (IB[2].uint8+readFlag(FlagBORROW).uint8) < dif)
             writeRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sbb " & regName(IB[1]) & " " & $IB[2])
         of 0x17:    # sbb dreg, dreg              0x17 0b010111 RR
             let dif = readDoubleRegister(IB[1])-readDoubleRegister(IB[2])-readFlag(FlagBORROW).uint8
             writeFlag(FlagBORROW, readDoubleRegister(IB[1]) < dif or (readDoubleRegister(IB[2])+readFlag(FlagBORROW).uint8) < dif)
             writeDoubleRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sbb " & dregName(IB[1]) & " " & dregName(IB[2]))
         of 0x18:    # sbb dreg, imm16             0x18 0b011000 RD
             let dif = readDoubleRegister(IB[1])-IB[2].uint16-readFlag(FlagBORROW).uint16
             writeFlag(FlagBORROW, readDoubleRegister(IB[1]) < dif or (IB[2].uint16+readFlag(FlagBORROW).uint16) < dif)
             writeDoubleRegister(dif, IB[1])
+            EchoIns.debugPrint(toHex(CIL,4) & " | sbb " & dregName(IB[1]) & " " & $IB[2])
         
         # jif (flags), (loc)          set program counter to (loc) if F & (flags) == (flags)
 
         of 0x1b:    # jif imm8, label/$imm16      0x1B 0b011011 BD
             if bitand(IB[1].uint8, readRegister(Flags)) == IB[1].uint8: writeDoubleRegister(IB[2].uint16, ProgramCounter)
+            EchoIns.debugPrint(toHex(CIL,4) & " | jif " & $IB[1] & " $" & toHex(IB[2],4))
         of 0x19:    # jif imm8, $dreg             0x19 0b011001 RB
             if bitand(IB[2].uint8, readRegister(Flags)) == IB[2].uint8: writeDoubleRegister(readRegister(IB[1]), ProgramCounter)
+            EchoIns.debugPrint(toHex(CIL,4) & " | jif " & $IB[2] & " $" & dregName(IB[1]))
         
         # cif (flags), (loc)          set program counter to (loc) and set R to address of the following instruction if F & (flags) == (flags)
 
@@ -275,15 +389,18 @@ while running:
             if bitand(IB[1].uint8, readRegister(Flags)) == IB[1].uint8:
                 writeDoubleRegister(readDoubleRegister(ProgramCounter), ReturnPointer)
                 writeDoubleRegister(IB[2].uint16, ProgramCounter)
+                EchoIns.debugPrint(toHex(CIL,4) & " | cif " & $IB[1] & " $" & toHex(IB[2],4))
         of 0x1a:    # cif imm8, $dreg             0x1A 0b011010 RB
             if bitand(IB[2].uint8, readRegister(Flags)) == IB[2].uint8:
                 writeDoubleRegister(readDoubleRegister(ProgramCounter), ReturnPointer)
                 writeDoubleRegister(readRegister(IB[1]), ProgramCounter)
+                EchoIns.debugPrint(toHex(CIL,4) & " | cif " & $IB[2] & " $" & dregName(IB[1]))
         
         # ret                         set program counter to R\
         
         of 0x1d:    # ret                         0x1D 0b011101 NA
             writeDoubleRegister(readDoubleRegister(ReturnPointer), ProgramCounter)
+            EchoIns.debugPrint(toHex(CIL,4) & " | ret")
         
         # push (value)                push (value) onto stack         * stack pointer decrements, most significant byte of int16 pushed first
 
@@ -421,5 +538,5 @@ while running:
             running = false
 
         else:
-            echo "invalid opcode at $", $(readDoubleRegister(ProgramCounter)-getInstructionLength(opcode).uint16)
+            error("Error", "invalid opcode at " & $(readDoubleRegister(ProgramCounter)-getInstructionLength(opcode).uint16))
             running = false

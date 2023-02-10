@@ -1,14 +1,14 @@
 @segment text
     @global main
 
-main: mov str, j
+main: mov str, rJ
 loop:
-    mov $j, a
-    cmp a, '\0'
+    mov $rJ, rA
+    cmp rA, '\0'
     jif 1, return
-    mov a, 0xffff
-    add j, 1
-    mov loop, p
+    mov rA, 0xffff
+    add rJ, 1
+    mov loop, rP
 
 return: hcf
 

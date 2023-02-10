@@ -42,9 +42,7 @@ proc clean(file: string): string = # does exactly what it sounds like it does: c
 
     for l in 0..lines.high:
         result.add lines[l]
-        if l < lines.high: result.add "\n"
-    
-    
+        if l < lines.high: result.add "\n" 
 
 proc decify(file: string): string = # turns all integer types and characters into decimal values for easier parsing later
     var lines = file.splitLines(true)
@@ -94,7 +92,6 @@ proc decify(file: string): string = # turns all integer types and characters int
         result.add lines[l]
         if l < lines.high: result.add "\n"
 
-
 proc populate(assemblyfile: string) =
     
     IList.add ["","","",""]
@@ -111,8 +108,7 @@ proc populate(assemblyfile: string) =
             else:
                 error("Invalid Instruction", "[" & $l & "] invalid argument number : " & currentLine)
             if l != assemblyfile.splitLines.len: IList.add ["","","",""]
-    
-    
+        
 proc generalChecks() =
     block globalChecks:
         var globalcount = 0

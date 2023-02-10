@@ -8,13 +8,13 @@ import std/math
 
 const horizontalMargin = 1 # pixels
 const verticalMargin = 1   # pixels
-const columns = 50
+const columns = 80
 const rows = 25
 const charHeight = 14 # pixels
 const charWidth = 8   # pixels
-const charScale = 2
-const controlCharsActive = true
-const invert = true
+const charScale = 1
+const controlCharsActive = false
+const invert = false
 
 var window = createWindow("h", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
 
@@ -99,8 +99,8 @@ proc rand(x: float): uint8 = ((pow(x, math.sqrt(x)) mod x) mod 150).uint8
 
 var running = true
 var i = 1500000.0
-i = 0.0
-#i = 4300000.0
+# i = 0.0
+i = 4300000.0
 while running:
 
     while pollEvent(event):
@@ -114,18 +114,18 @@ while running:
 
 
 
-    i += 1
-    characterIn(char(rand(i*0.0001)))
-
-
-
-
     # i += 1
-    # if rand(i*0.000002) mod 2 == 0:
-    #     #characterIn(0xDB.char())
-    #     characterIn((rand(i*0.000004)+33).char())
-    # else:
-    #     characterIn(0x00.char())
+    # characterIn(char(rand(i*0.001)))
+
+
+
+
+    i += 1
+    if rand(i*0.000003) mod 2 == 0:
+        #characterIn(0xDB.char())
+        characterIn((rand(i*0.000004)+50).char())
+    else:
+        characterIn(0x00.char())
 
 
 

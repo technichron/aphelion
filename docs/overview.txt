@@ -17,42 +17,44 @@ MEMORY
 
 REGISTERS (8-bit)
 
-    0x00  A  general
-    0x01  B  general
-    0x02  C  general
-    0x03  D  general
-    0x04  E  general
-    0x05  F  flags                               00[carry][borrow][greater][equal][less][zero]
-    0x06  G  general   UNSAFE                  * recommended for use w/ macro unpacking
-    0x08  IL general - low  byte of I
-    0x18  IH general - high byte of I
-    0x09  JL general - low  byte of J
-    0x19  JH general - high byte of J
-    0x0A  KL general - low  byte of K
-    0x1A  KH general - high byte of K
-    0x0B  PL program counter - low  byte of P
-    0x1B  PH program counter - high byte of P
-    0x0C  SL stack pointer - low  byte of S
-    0x1C  SH stack pointer - high byte of S
-    0x0D  RL return pointer - low  byte of R
-    0x1D  RH return pointer - high byte of R
-    0x0E  XL general / function argument - low  byte of X
-    0x1E  XH general / function argument - high byte of X
-    0x0F  YL general / function argument - low  byte of Y
-    0x1F  YH general / function argument - high byte of Y
+    0x00  rA  general
+    0x01  rB  general
+    0x02  rC  general
+    0x03  rD  general
+    0x04  rE  general
+    0x05  rF  flags                               00[carry][borrow][greater][equal][less][zero]
+    0x06  rGL general - low  byte of G  UNSAFE                  * do not use if your program uses macro instructions
+    0x16  rGH general - high byte of G  UNSAFE                  * do not use if your program uses macro instructions
+    0x08  rIL general - low  byte of I
+    0x18  rIH general - high byte of I
+    0x09  rJL general - low  byte of J
+    0x19  rJH general - high byte of J
+    0x0A  rKL general - low  byte of K
+    0x1A  rKH general - high byte of K
+    0x0B  rPL program counter - low  byte of P
+    0x1B  rPH program counter - high byte of P
+    0x0C  rSL stack pointer - low  byte of S
+    0x1C  rSH stack pointer - high byte of S
+    0x0D  rRL return pointer - low  byte of R
+    0x1D  rRH return pointer - high byte of R
+    0x0E  rXL general / function argument - low  byte of X
+    0x1E  rXH general / function argument - high byte of X
+    0x0F  rYL general / function argument - low  byte of Y
+    0x1F  rYH general / function argument - high byte of Y
  
 
 
 DOUBLE REGISTERS (16-bit)
 
-    0x08  I  general
-    0x09  J  general
-    0x0A  K  general
-    0x0B  P  program counter
-    0x0C  S  stack pointer   * initialized to the top of ram, 0xFFF0
-    0x0D  R  return pointer
-    0x0E  X  general / function argument
-    0x0F  Y  general / function argument
+    0x06  rG  general   UNSAFE                  * do not use if your program uses macro instructions
+    0x08  rI  general
+    0x09  rJ  general
+    0x0A  rK  general
+    0x0B  rP  program counter
+    0x0C  rS  stack pointer   * initialized to the top of ram, 0xFFF0
+    0x0D  rR  return pointer
+    0x0E  rX  general / function argument
+    0x0F  rY  general / function argument
 
 
 

@@ -1,18 +1,127 @@
 @segment text
 
-# default set of macros used by the assembler. use '@setting base_only' in your assembly to disable these.
-
 @macro out op
 	mov op, 0xFFFF
+@endmacro
 
 @macro in reg
 	mov 0xFFFF, reg
+@endmacro
 
 @macro jmp loc
-	mov loc, p
+	mov loc, rP
+@endmacro
 
 @macro call loc
 	cif 0, loc
+@endmacro
 
 @macro jez loc
 	jif 1, loc
+@endmacro
+
+@macro jnz loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	jif 1, loc
+@endmacro
+
+@macro jeq loc
+	jif 4, loc
+@endmacro
+
+@macro jne loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	jif 4, loc
+@endmacro
+
+@macro jlt loc
+	jif 2, loc
+@endmacro
+
+@macro jgt loc
+	jif 8, loc
+@endmacro
+
+@macro jle loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	jif 6, loc
+@endmacro
+
+@macro jge loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	jif 12, loc
+@endmacro
+
+@macro cez loc
+	cif 1, loc
+@endmacro
+
+@macro cnz loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	cif 1, loc
+@endmacro
+
+@macro ceq loc
+	cif 4, loc
+@endmacro
+
+@macro cne loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	cif 4, loc
+@endmacro
+
+@macro clt loc
+	cif 2, loc
+@endmacro
+
+@macro cgt loc
+	cif 8, loc
+@endmacro
+
+@macro cle loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	cif 6, loc
+@endmacro
+
+@macro cge loc
+	mov rF, rGL
+	not rGL
+	mov rGL, rF
+	cif 12, loc
+@endmacro
+
+@macro nand op1, op2
+	and op1, op2
+	not op1
+@endmacro
+
+@macro xor op1, op2
+	mov op1, rGL
+	or op1, op2
+	and rGL, op2
+	not rGL
+	and op1, rGL
+@endmacro
+
+@macro xnor op1, op2
+	mov op1, rGL
+	or op1, op2
+	and rGL, op2
+	not rGL
+	and op1, rGL
+	not op1
+@endmacro
