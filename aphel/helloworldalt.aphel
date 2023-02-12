@@ -12,5 +12,5 @@ loop:
 
 return: hcf
 
-@segment data
+@segment rodata
     str: string "hello world!\0"

@@ -3,17 +3,15 @@
 # ║ APHELION ASSEMBLER 2.0 ║ by technichron
 # ╚════════════════════════╝
 
-import std/strutils, std/sequtils, std/terminal, std/tables, codepage
+import std/strutils, std/sequtils, std/terminal, std/tables, std/os, std/parseopt, consts
 
 var IList: seq[array[4, string]] # [label, opcode, arg1, arg2]
 var 
     TextList: seq[array[4, string]]
     RODataList: seq[array[4, string]]
     DataList: seq[array[4, string]]
-# var TextList: seq[array[4, string]] # [label, opcode, arg1, arg2]
-# var DataList
-# var RODataList
 var SymbolTable: seq[array[2, string]]
+var Path: string
 
 proc `$`(s: seq[array[4, string]]): string =
     for element in s:
@@ -23,6 +21,20 @@ proc `$`(s: seq[array[4, string]]): string =
 proc error(errortype, message: string) =
     styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message
     quit(0)
+
+proc loadCMDLineArguments() = 
+    var p = initOptParser(commandLineParams().join(" "))
+    while true:
+        p.next()
+        case p.kind
+            of cmdEnd:
+                break
+            # of cmdLongOption:
+            #     if p.key == "show-instructions":
+            #         EchoIns = true
+            of cmdArgument:
+                Path = p.key
+            else: discard
 
 proc clean(file: string): string = # does exactly what it sounds like it does: clean comments and remove commas
     var lines = file.splitLines()
@@ -143,26 +155,45 @@ proc breakoutIList() =
     # echo RODataList
     # echo DataList
 
+proc argumentType(arg: string): string =
+    if arg == "":
+        return "none"
+    if arg[0] == '$':
+        result.add "addr "
+        result.add arg[1..arg.high]
+    else:
+        return arg
+        # result.add arg[1..arg.high]
+    # if arg[1..<arg.length] in ByteRegisterNames:
+    #     result += "reg"
+    # if arg[1..<arg.length] in DoubleRegisterNames:
+    #     result += "dreg"
+
 proc nameToOpcodeAndSuch() =
-    IList = concat(TextList, DataList)
+    IList = concat(TextList)
     for i in 0..<TextList.len:
         case TextList[i][1]:
         of "@global":
             TextList[i][1] = "0x06"
             TextList[i][3] = "0x0b"
         else:
+            TextList[i][2] = argumentType(TextList[i][2])
+            TextList[i][3] = argumentType(TextList[i][3])
             discard
+            
+
 
 
 # ------------------------------------------------------------------------- #
 
 
-var aphelFile = readFile("./aphel/helloworldalt.aphel")
+loadCMDLineArguments()
+var aphelFile = readFile(Path)
 aphelFile = aphelFile.decify()
 aphelFile = aphelFile.clean()
 populate(aphelFile)
 breakoutIList()
 generalChecks()
 nameToOpcodeAndSuch()
-writeFile("./src/assembler/bruh.txt", $IList)
+writeFile(Path.changeFileExt("txt"), $TextList)
 # echo GC_getStatistics()
