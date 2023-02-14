@@ -158,16 +158,26 @@ proc breakoutIList() =
 proc argumentType(arg: string): string =
     if arg == "":
         return "none"
-    if arg[0] == '$':
-        result.add "addr "
-        result.add arg[1..arg.high]
+    elif arg[0] == '$':
+        result.add "addr"
+        if arg[1..<arg.len] in ByteRegisterNames:
+            result.add " reg"
+        if arg[1..<arg.len] in DoubleRegisterNames:
+            result.add " dreg"
+    elif arg.toLower in ByteRegisterNames:
+        return "reg"
+    elif arg.toLower in DoubleRegisterNames:
+        return "dreg"
     else:
-        return arg
-        # result.add arg[1..arg.high]
-    # if arg[1..<arg.length] in ByteRegisterNames:
-    #     result += "reg"
-    # if arg[1..<arg.length] in DoubleRegisterNames:
-    #     result += "dreg"
+        try:
+            let x = parseInt(arg)
+            return "int"
+        except ValueError:
+            return arg
+
+
+
+    
 
 proc nameToOpcodeAndSuch() =
     IList = concat(TextList)
