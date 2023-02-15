@@ -155,15 +155,15 @@ proc breakoutIList() =
     # echo RODataList
     # echo DataList
 
-proc argumentType(arg: string): string =
+proc argType(arg: string): string =
     if arg == "":
         return "none"
     elif arg[0] == '$':
-        result.add "addr"
+        result.add "address"
         if arg[1..<arg.len] in ByteRegisterNames:
-            result.add " reg"
+            result.add "_reg"
         if arg[1..<arg.len] in DoubleRegisterNames:
-            result.add " dreg"
+            result.add "_dreg"
     elif arg.toLower in ByteRegisterNames:
         return "reg"
     elif arg.toLower in DoubleRegisterNames:
@@ -173,11 +173,10 @@ proc argumentType(arg: string): string =
             let x = parseInt(arg)
             return "int"
         except ValueError:
-            return arg
+            return "label"
 
-
-
-    
+proc argTypes(line: array[4, string]): string =
+    return argType(line[2]) & " " & argType(line[3])
 
 proc nameToOpcodeAndSuch() =
     IList = concat(TextList)
@@ -186,9 +185,34 @@ proc nameToOpcodeAndSuch() =
         of "@global":
             TextList[i][1] = "0x06"
             TextList[i][3] = "0x0b"
+
+        of "nop":
+            if argTypes(TextList[i]) != "none none":
+                error("Invalid Arguments", "\"" & $argTypes(TextList[i]) & "\" are not valid arguments for \'nop\'")
+            TextList[i][1] = "0x00"
+        
+        of "mov":
+            case argTypes(TextList[i])
+            of "reg address":
+                TextList[i][1] = "0x01"
+            of "reg reg":
+                TextList[i][1] = "0x02"
+            of "dreg dreg":
+                TextList[i][1] = "0x03"
+            of "int reg":
+                TextList[i][1] = "0x04"
+            of "int address":
+                TextList[i][1] = "0x05"
+            of "int dreg":
+                TextList[i][1] = "0x06"
+            of "address reg":
+                TextList[i][1] = "0x07"
+            of "address address":
+                TextList[i][1] = "0x08"
+
         else:
-            TextList[i][2] = argumentType(TextList[i][2])
-            TextList[i][3] = argumentType(TextList[i][3])
+            # TextList[i][2] = argType(TextList[i][2])
+            # TextList[i][3] = argType(TextList[i][3])
             discard
             
 
@@ -206,4 +230,4 @@ breakoutIList()
 generalChecks()
 nameToOpcodeAndSuch()
 writeFile(Path.changeFileExt("txt"), $TextList)
-# echo GC_getStatistics()
+echo GC_getStatistics()

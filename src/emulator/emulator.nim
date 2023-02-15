@@ -80,7 +80,7 @@ proc regName(i: int): string =
     of 0x1E: return "rXH"
     of 0x0F: return "rYL"
     of 0x1F: return "rYH"
-    else: return "INV"
+    else: return "rINV"
 
 proc dregName(i: int): string =
     case i
@@ -93,7 +93,7 @@ proc dregName(i: int): string =
     of 0x0D: return "rR"
     of 0x0E: return "rX"
     of 0x0F: return "rY"
-    else: return "INV"
+    else: return "rINV"
 
 proc loadAMG(memarray: var array[0x10000, uint8], path: string) =
     try:
@@ -155,20 +155,19 @@ proc write(value: uint8, address: SomeInteger) =
         charOut(value)
 
 proc readRegister(code: int): uint8 =
-    if regName(code) == "INV": error("Error", "invalid register read")
+    if regName(code) == "rINV": error("Error", "invalid register read")
     return Registers[code]
 
-
 proc writeRegister(value: uint8, code: int) =
-    if regName(code) == "INV": error("Error", "invalid register write")
+    if regName(code) == "rINV": error("Error", "invalid register write")
     Registers[code] = value
 
 proc readDoubleRegister(code: int): uint16 =
-    if regName(code) == "INV" or regName(code+16) == "INV": error("Error", "invalid register read")
+    if regName(code) == "rINV" or regName(code+16) == "rINV": error("Error", "invalid register read")
     return uint16(Registers[code+16]*256 + Registers[code])
 
 proc writeDoubleRegister(value: uint16, code:int) =
-    if regName(code) == "INV" or regName(code+16) == "INV": error("Error", "invalid register write")
+    if regName(code) == "rINV" or regName(code+16) == "rINV": error("Error", "invalid register write")
     Registers[code] = uint8(value.bitsliced(0..7))
     Registers[code+16] = uint8(value.bitsliced(8..15))
 
