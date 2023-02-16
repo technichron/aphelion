@@ -173,7 +173,7 @@ proc argType(arg: string): string =
             let x = parseInt(arg)
             return "int"
         except ValueError:
-            return "label"
+            return "address"
 
 proc argTypes(line: array[4, string]): string =
     return argType(line[2]) & " " & argType(line[3])
@@ -188,7 +188,7 @@ proc nameToOpcodeAndSuch() =
 
         of "nop":
             if argTypes(TextList[i]) != "none none":
-                error("Invalid Arguments", "\"" & $argTypes(TextList[i]) & "\" are not valid arguments for \'nop\'")
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"nop\"")
             TextList[i][1] = "0x00"
         
         of "mov":
@@ -199,21 +199,210 @@ proc nameToOpcodeAndSuch() =
                 TextList[i][1] = "0x02"
             of "dreg dreg":
                 TextList[i][1] = "0x03"
-            of "int reg":
+            of "reg int":
                 TextList[i][1] = "0x04"
             of "int address":
                 TextList[i][1] = "0x05"
-            of "int dreg":
+            of "dreg int":
                 TextList[i][1] = "0x06"
             of "address reg":
                 TextList[i][1] = "0x07"
             of "address address":
                 TextList[i][1] = "0x08"
+            of "address_dreg address":
+                TextList[i][1] = "0x3c"
+            of "address_dreg dreg":
+                TextList[i][1] = "0x3d"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"mov\"")
+
+        of "add":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x09"
+            of "reg int":
+                TextList[i][1] = "0x0a"
+            of "dreg dreg":
+                TextList[i][1] = "0x0b"
+            of "dreg int":
+                TextList[i][1] = "0x0c"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"add\"")
+        
+        of "adc":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x0d"
+            of "reg int":
+                TextList[i][1] = "0x0e"
+            of "dreg dreg":
+                TextList[i][1] = "0x0f"
+            of "dreg int":
+                TextList[i][1] = "0x10"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"adc\"")
+
+        of "sub":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x11"
+            of "reg int":
+                TextList[i][1] = "0x12"
+            of "dreg dreg":
+                TextList[i][1] = "0x13"
+            of "dreg int":
+                TextList[i][1] = "0x14"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"sub\"")
+        
+        of "sbb":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x15"
+            of "reg int":
+                TextList[i][1] = "0x16"
+            of "dreg dreg":
+                TextList[i][1] = "0x17"
+            of "dreg int":
+                TextList[i][1] = "0x18"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"sbb\"")
+        
+        of "jif":
+            case argTypes(TextList[i])
+            of "int address":
+                TextList[i][1] = "0x1b"
+            of "reg int":
+                TextList[i][1] = "0x19"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"jif\"")
+        
+        of "cif":
+            case argTypes(TextList[i])
+            of "int address":
+                TextList[i][1] = "0x1c"
+            of "reg int":
+                TextList[i][1] = "0x1a"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"cif\"")
+
+        of "ret":
+            if argTypes(TextList[i]) != "none none":
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"ret\"")
+            TextList[i][1] = "0x1D"
+        
+        of "push":
+            case argTypes(TextList[i])
+            of "reg none":
+                TextList[i][1] = "0x1e"
+            of "dreg none":
+                TextList[i][1] = "0x1f"
+            of "int none":
+                if parseInt(TextList[i][2]) > 0xff or parseInt(TextList[i][2]) < -0x80:
+                    TextList[i][1] = "0x21"
+                else:
+                    TextList[i][1] = "0x20"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"push\"")
+
+        of "pop":
+            case argTypes(TextList[i])
+            of "reg none":
+                TextList[i][1] = "0x22"
+            of "dreg none":
+                TextList[i][1] = "0x23"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"pop\"")
+
+        of "and":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x"
+            of "reg int":
+                TextList[i][1] = "0x"
+            of "dreg dreg":
+                TextList[i][1] = "0x"
+            of "dreg int":
+                TextList[i][1] = "0x"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"and\"")
+        
+        of "or":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x"
+            of "reg int":
+                TextList[i][1] = "0x"
+            of "dreg dreg":
+                TextList[i][1] = "0x"
+            of "dreg int":
+                TextList[i][1] = "0x"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"or\"")
+
+        of "cmp":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x"
+            of "reg int":
+                TextList[i][1] = "0x"
+            of "dreg dreg":
+                TextList[i][1] = "0x"
+            of "dreg int":
+                TextList[i][1] = "0x"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"cmp\"")
+        
+        of "scmp":
+            case argTypes(TextList[i])
+            of "reg reg":
+                TextList[i][1] = "0x"
+            of "reg int":
+                TextList[i][1] = "0x"
+            of "dreg dreg":
+                TextList[i][1] = "0x"
+            of "dreg int":
+                TextList[i][1] = "0x"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"scmp\"")
+        
+        of "shl":
+            case argTypes(TextList[i])
+            of "reg int":
+                TextList[i][1] = "0x36"
+            of "dreg int":
+                TextList[i][1] = "0x37"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"shl\"")
+        
+        of "asr":
+            case argTypes(TextList[i])
+            of "reg int":
+                TextList[i][1] = "0x38"
+            of "dreg int":
+                TextList[i][1] = "0x39"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"asr\"")
+        
+        of "lsr":
+            case argTypes(TextList[i])
+            of "reg int":
+                TextList[i][1] = "0x3A"
+            of "dreg int":
+                TextList[i][1] = "0x3B"
+            else:
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"lsr\"")
+        
+        of "ret":
+            if argTypes(TextList[i]) != "none none":
+                error("Invalid Arguments", "\"" & argTypes(TextList[i]) & "\" are not valid arguments for \"hcf\"")
+            TextList[i][1] = "0x3F"
 
         else:
             # TextList[i][2] = argType(TextList[i][2])
             # TextList[i][3] = argType(TextList[i][3])
-            discard
+            error("Invalid Instruction", "\"" & TextList[i][1] & "\" is not a valid instruction")
+            # discard
             
 
 
