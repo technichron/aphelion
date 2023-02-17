@@ -2,11 +2,11 @@
     @global _main
 
 _main: mov _str, rJ
-_loop:
+loop:
     mov $rJ, rA
     cmp rA, '\0'
     jif 1, _return
-    mov rA, 0xffff
+    mov rA, $0xffff
     add rJ, 1
     mov _loop, rP
 

@@ -1,5 +1,5 @@
 @segment text
-    global main
+    @global main
 
 main:
     out 'H'
