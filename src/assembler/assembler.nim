@@ -6,7 +6,8 @@
 import std/strutils, std/sequtils, std/terminal, std/tables, std/os, std/parseopt, std/bitops
 from std/unicode import graphemeLen
 
-const codepage = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":0x05,"♠":0x06,"•":0x07,"\\b":0x08,"○":0x09,"\\n":0x0A,"\\c":0x0B,"\\r":0x0C,"♪":0x0D,"\\i":0x0E,"\\d":0x0F,
+const 
+    codepage = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":0x05,"♠":0x06,"•":0x07,"\\b":0x08,"○":0x09,"\\n":0x0A,"\\c":0x0B,"\\r":0x0C,"♪":0x0D,"\\i":0x0E,"\\d":0x0F,
                   "►":0x10,"◄":0x11,"↕":0x12,"‼":0x13,"¶":0x14,"§":0x15,"▬":0x16,"↨":0x17,"↑":0x18,"↓":0x19,"→":0x1A,"←":0x1B,"∟":0x1C,"↔":0x1D,"▲":0x1E,"▼":0x1F,
                   " ":0x20,"!":0x21,"\\\"":0x22,"#":0x23,"$":0x24,"%":0x25,"&":0x26,"\\\'":0x27,"(":0x28,")":0x29,"*":0x2A,"+":0x2B,",":0x2C,"-":0x2D,".":0x2E,"/":0x2F,
                   "0":0x30,"1":0x31,"2":0x32,"3":0x33,"4":0x34,"5":0x35,"6":0x36,"7":0x37,"8":0x38,"9":0x39,":":0x3A,";":0x3B,"<":0x3C,"=":0x3D,">":0x3E,"?":0x3F,
@@ -23,12 +24,11 @@ const codepage = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":0
                   "α":0xE0,"ß":0xE1,"Γ":0xE2,"π":0xE3,"Σ":0xE4,"σ":0xE5,"µ":0xE6,"τ":0xE7,"Φ":0xE8,"Θ":0xE9,"Ω":0xEA,"δ":0xEB,"∞":0xEC,"φ":0xED,"ε":0xEE,"∩":0xEF,
                   "≡":0xF0,"±":0xF1,"≥":0xF2,"≤":0xF3,"⌠":0xF4,"⌡":0xF5,"÷":0xF6,"≈":0xF7,"°":0xF8,"∙":0xF9,"·":0xFA,"√":0xFB,"ⁿ":0xFC,"²":0xFD,"■":0xFE,"\\a":0xFF}.toTable()
 
-const ByteRegisterNames = "ra rb rc rd re rf rgl rgh ril rih rjl rjh rkl rkh rpl rph rsl rsh rrl rrh rxl rxh ryl ryh "
-const DoubleRegisterNames = "rg ri rj rk rp rs rx ry "
-
-const RegisterCodes = {"ra": 0x00,"rb": 0x01,"rc": 0x02,"rd": 0x03,"re": 0x04,"rf": 0x05,"rgl": 0x06,"rgh": 0x16,"ril": 0x08,"rih": 0x18,"rjl": 0x09,"rjh": 0x19,"rkl": 0x0a,"rkh": 0x1a
+    ByteRegisterNames = "ra rb rc rd re rf rgl rgh ril rih rjl rjh rkl rkh rpl rph rsl rsh rrl rrh rxl rxh ryl ryh "
+    DoubleRegisterNames = "rg ri rj rk rp rs rx ry "
+    RegisterCodes = {"ra": 0x00,"rb": 0x01,"rc": 0x02,"rd": 0x03,"re": 0x04,"rf": 0x05,"rgl": 0x06,"rgh": 0x16,"ril": 0x08,"rih": 0x18,"rjl": 0x09,"rjh": 0x19,"rkl": 0x0a,"rkh": 0x1a
                         ,"rpl": 0x0b,"rph": 0x1b,"rsl": 0x0c,"rsh": 0x1c,"rrl": 0x0d,"rrh": 0x1d,"rxl": 0x0e,"rxh": 0x1e,"ryl": 0x0f,"ryh": 0x1f
-                        ,"rg": 0x06,"ri": 0x08,"rj": 0x09,"rk": 0x0a,"rp": 0x0b,"rs": 0x0c,"rr": 0x0d,"rx": 0x0e,"ry": 0x0f}.toTable()
+,"rg": 0x06,"ri": 0x08,"rj": 0x09,"rk": 0x0a,"rp": 0x0b,"rs": 0x0c,"rr": 0x0d,"rx": 0x0e,"ry": 0x0f}.toTable()
 
 var 
     ITable: seq[array[4, string]] # [label, opcode, arg1, arg2]
@@ -39,26 +39,8 @@ var
     Path: string
     AphelionImage: string
 
-# proc `$`(s: seq[array[4, string]]): string =
-#     for element in s:
-#         for subelement in element:
-#             if subelement == "":
-#                 result.add "\t"
-#             result.add subelement
-#             result.add "\t"
-#         result.add "\n"
-
 proc `$`(s: seq[array[4, string]]): string =
     for element in s:
-        # result.add element[0]
-        # result.add "\t"
-        # if element[0] == "": result.add "\t │ "
-        # else: result.add " ╪ "
-        # result.add element[1]
-        # result.add "\t"
-        # result.add element[2]
-        # result.add "\t"escape
-        # result.add element[3]
         result.add $element
         result.add "\n"
 
@@ -158,48 +140,48 @@ proc clean(file: string): string = # does exactly what it sounds like it does: c
         if l < lines.high: result.add "\n" 
 
 proc decify(file: string): string = # turns all integer types and characters into decimal values for easier parsing later
-    var lines = file.splitLines(true)
+    var lines = file.splitLines()
+    for x in 0..1: # iteration times
+        for l in 0..lines.high():
+            lines[l] = lines[l].strip
+            lines[l].add(" ")
+            if find(lines[l], '\'') != -1:
+                let character =  lines[l][find(lines[l], '\'')..find(lines[l], '\'', find(lines[l], '\'')+1)]
+                try: lines[l] = lines[l].replace(character, $codepage[character[1..(character.len-2)]])
+                except:
+                    error("Invalid Argument", "[" & $l & "] invalid char: " & character)
 
-    for l in 0..lines.high():
-        lines[l] = lines[l].strip
-        lines[l].add(" ")
-        if find(lines[l], '\'') != -1:
-            let character =  lines[l][find(lines[l], '\'')..find(lines[l], '\'', find(lines[l], '\'')+1)]
-            try: lines[l] = lines[l].replace(character, $codepage[character[1..(character.len-2)]])
-            except:
-                error("Invalid Argument", "[" & $l & "] invalid char: " & character)
+            if find(lines[l], "0x") != -1:
+                let num = lines[l][find(lines[l], "0x")..find(lines[l], Whitespace, find(lines[l], "0x")+1)].strip(chars = ({','}+Whitespace))
+                try: lines[l] = lines[l].replace(num, $fromHex[uint](num))
+                except:
+                    error("Invalid Argument", "[" & $l & "] invalid hexadecimal integer: " & num)
 
-        if find(lines[l], "0x") != -1:
-            let num = lines[l][find(lines[l], "0x")..find(lines[l], Whitespace, find(lines[l], "0x")+1)].strip(chars = ({','}+Whitespace))
-            try: lines[l] = lines[l].replace(num, $fromHex[uint](num))
-            except:
-                error("Invalid Argument", "[" & $l & "] invalid hexadecimal integer: " & num)
-
-        if find(lines[l], "0b") != -1:
-            let num = lines[l][find(lines[l], "0b")..find(lines[l], Whitespace, find(lines[l], "0b")+1)].strip(chars = ({','}+Whitespace))
-            try: lines[l] = lines[l].replace(num, $fromBin[uint](num))
-            except:
-                echo num
-                error("Invalid Argument", "[" & $l & "] invalid binary integer: " & num)
-        
-        if find(lines[l], "0o") != -1:
-            let num = lines[l][find(lines[l], "0o")..find(lines[l], Whitespace, find(lines[l], "0o")+1)].strip(chars = ({','}+Whitespace))
-            try: lines[l] = lines[l].replace(num, $fromOct[uint](num))
-            except:
-                echo num
-                error("Invalid Argument", "[" & $l & "] invalid octal integer: " & num)
-        if find(lines[l], '\"') != -1:
-            var str = ""
-            try:
-                str = lines[l][find(lines[l], '\"')..find(lines[l], '\"', find(lines[l], '\"')+1)]
-                lines[l] = lines[l].replace(str, str.replace(" ", "\\_").strip(chars = {'\'', '\"'})) #\_ is escape code for space
-            except:
-                str = lines[l][find(lines[l], '\"')..find(lines[l], Whitespace, find(lines[l], '\"')+1)]
-                error("Invalid Argument", "[" & $l & "] invalid string: " & str)
-        if lines[l].split[0].endsWith(':') and lines[l].split.len > 1:
-            var line = lines[l].split
-            line[0].add "\n"
-            lines[l] = line.join(" ")
+            if find(lines[l], "0b") != -1:
+                let num = lines[l][find(lines[l], "0b")..find(lines[l], Whitespace, find(lines[l], "0b")+1)].strip(chars = ({','}+Whitespace))
+                try: lines[l] = lines[l].replace(num, $fromBin[uint](num))
+                except:
+                    echo num
+                    error("Invalid Argument", "[" & $l & "] invalid binary integer: " & num)
+            
+            if find(lines[l], "0o") != -1:
+                let num = lines[l][find(lines[l], "0o")..find(lines[l], Whitespace, find(lines[l], "0o")+1)].strip(chars = ({','}+Whitespace))
+                try: lines[l] = lines[l].replace(num, $fromOct[uint](num))
+                except:
+                    echo num
+                    error("Invalid Argument", "[" & $l & "] invalid octal integer: " & num)
+            if find(lines[l], '\"') != -1:
+                var str = ""
+                try:
+                    str = lines[l][find(lines[l], '\"')..find(lines[l], '\"', find(lines[l], '\"')+1)]
+                    lines[l] = lines[l].replace(str, str.replace(" ", "\\_").strip(chars = {'\'', '\"'})) #\_ is escape code for space
+                except:
+                    str = lines[l][find(lines[l], '\"')..find(lines[l], Whitespace, find(lines[l], '\"')+1)]
+                    error("Invalid Argument", "[" & $l & "] invalid string: " & str)
+            if lines[l].split[0].endsWith(':') and lines[l].split.len > 1:
+                var line = lines[l].split
+                line[0].add "\n"
+                lines[l] = line.join(" ")
     
     for l in 0..lines.high:
         result.add lines[l]
@@ -224,8 +206,7 @@ proc populate(assemblyfile: string) =
     
     for i in 0..<ITable.len:
         if ITable[i][1] == "string": ITable[i][2] = ITable[i][2].replace("\\_", " ")
-        
-        
+                
 proc generalChecks() =
     block globalChecks:
         var globalcount = 0
@@ -465,7 +446,6 @@ proc aphLen(s: string): int = # gets length of string using the aphelion codepag
                 error("Invalid Argument", "\'" & $s[pos..<(pos+s.graphemeLen(pos))] & "\' is not encodable - see the codepage for all encodable characters")
         inc acc
     return acc
-
 
 proc resolveLabels() = 
     ITable = concat(TextTable, RODataTable)

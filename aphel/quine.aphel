@@ -13,4 +13,4 @@ _loop:
 _return: mov _return, rP
 
 @segment rodata
-    _str:   file "T:\vscode\aphelion\aphel\quine.aphel"
+_str:   file "T:\vscode\aphelion\aphel\quine.aphel"
