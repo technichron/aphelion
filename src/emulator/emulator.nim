@@ -27,6 +27,7 @@ var IB: array[3, int]           # (clean) instruction buffer - [opcode, arg1, ar
 var BinaryPath = ""
 var IgnoreAMGLength = false
 var EchoIns = false
+var SleepDelay = 0
 
 proc error(errortype, message: string) =
     styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message
@@ -47,6 +48,8 @@ proc loadCMDLineArguments() =
                     EchoIns = true
                 if p.key == "ignore-size":
                     IgnoreAMGLength = true
+                if p.key == "delay":
+                    SleepDelay = parseInt(p.val)
             of cmdArgument:
                  BinaryPath = p.key
             else: discard
@@ -190,15 +193,15 @@ var runtime = 0;
 var running = true
 while running:
 
-    #os.sleep(100)
+    os.sleep(SleepDelay)
 
     while pollEvent(event):
         if event.kind == QuitEvent:
             running = false
             break
         if event.kind == KeyDown:
-            echo "key press"
-            echo event.key.keysym.sym
+            # echo "key press"
+            # echo event.key.keysym.sym
             break
 
     BIB[0] = read(readDoubleRegister(ProgramCounter))

@@ -596,7 +596,7 @@ proc constructImage() =
         else:
             error("Invalid Datatype", "\"" & data[1] & "\" is not a valid datatype")
     
-    while AphelionImage.len <= 0x9000:
+    while AphelionImage.len < 0x9000:
         addByte(0)
     
     for data in DataTable:

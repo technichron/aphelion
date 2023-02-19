@@ -12,5 +12,5 @@ _loop:
 
 _return: mov _return, rP
 
-@segment data
-   _str:   string "hello world!!!\0"
+@segment rodata
+    _str:   file "T:\vscode\aphelion\aphel\quine.aphel"
