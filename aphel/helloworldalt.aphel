@@ -12,5 +12,5 @@ _loop:
 
 _return: mov _return, rP
 
-@segment data
+@segment rodata
    _str:   string "hello world!!!\0"

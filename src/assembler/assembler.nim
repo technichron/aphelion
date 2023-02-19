@@ -636,7 +636,7 @@ proc constructImage() =
     while AphelionImage.len <= 0xFFFF:
         addByte(0)
 
-# ------------------------------------------------------------------------- #
+# ----------------------------- time to run shit ----------------------------- #
 
 proc main() = 
     loadCMDLineArguments()

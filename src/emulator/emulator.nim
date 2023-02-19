@@ -189,7 +189,7 @@ loadCMDLineArguments()
 MemorySpace.loadAMG(BinaryPath)
 writeDoubleRegister(0x0FFF0, StackPointer)
 
-var runtime = 0;
+#var runtime = 0;
 var running = true
 while running:
 
