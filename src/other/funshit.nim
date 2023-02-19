@@ -24,7 +24,7 @@ var render = createRenderer(window, -1, Renderer_Software)
 var cursorRow = 0
 var cursorCol = 0
 
-let fontImage = readImage("src/assets/3dfx8x14.png")
+let fontImage = readImage("src/assets/font.png")
 
 proc setcolor(color: ColorRGBX) =
     if invert:

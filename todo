@@ -1,4 +1,4 @@
 general:
-	finish emulator
-	finalize assembly syntax
-	start on assembler
+	finish assembler features
+		macros, imports/includes
+	keyboard input for the emulator

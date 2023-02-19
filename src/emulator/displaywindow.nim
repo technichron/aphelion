@@ -9,7 +9,7 @@ const charWidth* = 8   # pixels
 const charScale* = 1
 const controlCharsActive* = true
 
-var window = createWindow("aphelion 2.0 terminal", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
+var window = createWindow("aphelion 2 terminal", 100, 100, cint((charWidth*charScale*columns)+(horizontalMargin*2)), cint((charHeight*charScale*rows)+(verticalMargin*2)), SDL_WINDOW_SHOWN) # 80x25 character display
 let icon = loadBMP("src/assets/icon.bmp")
 window.setIcon(icon)
 
@@ -19,7 +19,7 @@ var render = createRenderer(window, -1, Renderer_Software)
 var cursorRow = 0
 var cursorCol = 0
 
-let fontImage = readImage("src/assets/3dfx8x14.png")
+let fontImage = readImage("src/assets/font.png")
 
 proc drawPixel*(x,y: int) =
     for xs in 1..charScale:

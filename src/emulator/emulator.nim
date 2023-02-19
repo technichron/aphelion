@@ -190,6 +190,8 @@ var runtime = 0;
 var running = true
 while running:
 
+    #os.sleep(100)
+
     while pollEvent(event):
         if event.kind == QuitEvent:
             running = false
@@ -241,9 +243,9 @@ while running:
 
         # mov (src), (dest)           copy data from (src) to (dest)
 
-        of 0x01:    # mov reg, $imm16             0x01 0b000001 RD
+        of 0x01:    # mov reg, imm16              0x01 0b000001 RD
             write(readRegister(IB[1]), IB[2])
-            EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov " & regName(IB[1]) & " $" & toHex(IB[2],4))
+            EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov " & regName(IB[1]) & " " & toHex(IB[2],4))
         of 0x02:    # mov reg, reg                0x02 0b000010 RR
             writeRegister(readRegister(IB[1]), IB[2])
             EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov " & regName(IB[1]) & " " & regName(IB[2]))
@@ -268,9 +270,9 @@ while running:
         of 0x3c:    # mov $dreg, $imm16           0x3C 0b001000 RD
             write(read(readDoubleRegister(IB[1])), IB[2])
             EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov $" & dregName(IB[1]) & " $" & toHex(IB[2],4))
-        of 0x3d:    # mov $dreg, dreg             0x3D 0b001000 RR
-            writeDoubleRegister(read(readDoubleRegister(IB[1])), IB[2])
-            EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov $" & dregName(IB[1]) & " $" & dregName(IB[2]))
+        of 0x3d:    # mov $dreg, reg             0x3D 0b001000 RR
+            writeRegister(read(readDoubleRegister(IB[1])), IB[2])
+            EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov $" & dregName(IB[1]) & " " & regName(IB[2]))
 
         # add (op1), (op2)            (op1) = (op1) + (op2)
 
@@ -369,10 +371,10 @@ while running:
 
         of 0x1b:    # jif imm8, label/$imm16      0x1B 0b011011 BD
             if bitand(IB[1].uint8, readRegister(Flags)) == IB[1].uint8: writeDoubleRegister(IB[2].uint16, ProgramCounter)
-            EchoIns.debugPrint(toHex(CIL,4) & " ╪ jif " & $IB[1] & " $" & toHex(IB[2],4))
-        of 0x19:    # jif imm8, $dreg             0x19 0b011001 RB
+            EchoIns.debugPrint(toHex(CIL,4) & " ╪ jif " & $IB[1] & " " & toHex(IB[2],4))
+        of 0x19:    # jif imm8, dreg              0x19 0b011001 RB
             if bitand(IB[2].uint8, readRegister(Flags)) == IB[2].uint8: writeDoubleRegister(readRegister(IB[1]), ProgramCounter)
-            EchoIns.debugPrint(toHex(CIL,4) & " ╪ jif " & $IB[2] & " $" & dregName(IB[1]))
+            EchoIns.debugPrint(toHex(CIL,4) & " ╪ jif " & $IB[2] & " " & dregName(IB[1]))
         
         # cif (flags), (loc)          set program counter to (loc) and set R to address of the following instruction if F & (flags) == (flags)
 
@@ -380,12 +382,12 @@ while running:
             if bitand(IB[1].uint8, readRegister(Flags)) == IB[1].uint8:
                 writeDoubleRegister(readDoubleRegister(ProgramCounter), ReturnPointer)
                 writeDoubleRegister(IB[2].uint16, ProgramCounter)
-                EchoIns.debugPrint(toHex(CIL,4) & " ╪ cif " & $IB[1] & " $" & toHex(IB[2],4))
-        of 0x1a:    # cif imm8, $dreg             0x1A 0b011010 RB
+                EchoIns.debugPrint(toHex(CIL,4) & " ╪ cif " & $IB[1] & " " & toHex(IB[2],4))
+        of 0x1a:    # cif imm8, dreg              0x1A 0b011010 RB
             if bitand(IB[2].uint8, readRegister(Flags)) == IB[2].uint8:
                 writeDoubleRegister(readDoubleRegister(ProgramCounter), ReturnPointer)
                 writeDoubleRegister(readRegister(IB[1]), ProgramCounter)
-                EchoIns.debugPrint(toHex(CIL,4) & " ╪ cif " & $IB[2] & " $" & dregName(IB[1]))
+                EchoIns.debugPrint(toHex(CIL,4) & " ╪ cif " & $IB[2] & " " & dregName(IB[1]))
         
         # ret                         set program counter to R\
         
@@ -563,6 +565,6 @@ while running:
             error("Error", "invalid opcode at " & $(readDoubleRegister(ProgramCounter)-getInstructionLength(opcode).uint16))
             running = false
     
-    #if runtime == 20: running = false
+    # if runtime == 20: running = false
         
-    runtime+=1
+    # runtime+=1

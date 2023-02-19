@@ -37,10 +37,10 @@ REGISTERS (8-bit)
     0x1C  rSH stack pointer - high byte of S
     0x0D  rRL return pointer - low  byte of R
     0x1D  rRH return pointer - high byte of R
-    0x0E  rXL general / function argument - low  byte of X
-    0x1E  rXH general / function argument - high byte of X
-    0x0F  rYL general / function argument - low  byte of Y
-    0x1F  rYH general / function argument - high byte of Y
+    0x0E  rXL general - low  byte of X
+    0x1E  rXH general - high byte of X
+    0x0F  rYL general - low  byte of Y
+    0x1F  rYH general - high byte of Y
  
 
 
@@ -53,8 +53,8 @@ DOUBLE REGISTERS (16-bit)
     0x0B  rP  program counter
     0x0C  rS  stack pointer   * initialized to the top of ram, 0xFFF0
     0x0D  rR  return pointer
-    0x0E  rX  general / function argument
-    0x0F  rY  general / function argument
+    0x0E  rX  general
+    0x0F  rY  general
 
 
 

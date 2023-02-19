@@ -5,15 +5,15 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         nop                         0x00 0b000000 NA
 
     mov (src), (dest)           copy data from (src) to (dest)
-        mov reg, $imm16             0x01 0b000001 RD
+        mov reg, imm16              0x01 0b000001 RD
         mov reg, reg                0x02 0b000010 RR
         mov dreg, dreg              0x03 0b000011 RR
         mov imm8, reg               0x04 0b000100 RB
-        mov imm8, $imm16            0x05 0b000101 BD
+        mov imm8, imm16             0x05 0b000101 BD
         mov imm16, dreg             0x06 0b000110 RD
         mov $imm16, reg             0x07 0b000111 RD
-        mov $imm16, $imm16          0x08 0b001000 DD
-        mov $dreg, $imm16           0x3C 0b001000 RD
+        mov $imm16, imm16           0x08 0b001000 DD
+        mov $dreg, imm16            0x3C 0b001000 RD
         mov $dreg, dreg             0x3D 0b001000 RR
 
     add (op1), (op2)            (op1) = (op1) + (op2)
@@ -41,12 +41,12 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         sbb dreg, imm16             0x18 0b011000 RD
 
     jif (flags), (loc)          set program counter to (loc) if F & (flags) == (flags)
-        jif imm8, label/$imm16      0x1B 0b011011 BD
-        jif imm8, $dreg             0x19 0b011001 RB
+        jif imm8, label/imm16       0x1B 0b011011 BD
+        jif imm8, dreg              0x19 0b011001 RB
 
     cif (flags), (loc)          set program counter to (loc) and set R to address of the following instruction if F & (flags) == (flags)
-        cif imm8, label/$imm16      0x1C 0b011100 BD
-        cif imm8, $dreg             0x1A 0b011010 RB
+        cif imm8, label/imm16       0x1C 0b011100 BD
+        cif imm8, dreg              0x1A 0b011010 RB
 
     ret                         set program counter to R
         ret                         0x1D 0b011101 NA
@@ -101,6 +101,9 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         lsr reg, imm8               0x3A 0b111010 RB
         lsr dreg, imm8              0x3B 0b111011 RB
 
+    ext                         undefined - may be used for isa extensions
+                                    0x3E 0b111110 NA
+
     hcf                         halt and catch fire
         hcf                         0x3F 0b111111 NA
 
@@ -117,12 +120,10 @@ SEGMENTATION
 
 
     supported data types:   * little endian
-        int8        8 bit unsigned integer
+        uint8       8 bit unsigned integer
         sint8       8 bit signed integer
-        int16       16 bit unsigned integer
+        uint16      16 bit unsigned integer
         sint16      16 bit signed integer
-        int32       32 bit unsigned integer
-        sint32      32 bit signed integer
         char        8 bit ascii character
         string      sequence of chars
         file        file

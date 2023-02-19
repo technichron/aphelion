@@ -2,15 +2,15 @@
     @global _main
 
 _main: mov _str, rJ
-loop:
+_loop:
     mov $rJ, rA
     cmp rA, '\0'
     jif 1, _return
-    mov rA, $0xffff
+    mov rA, 0xffff
     add rJ, 1
     mov _loop, rP
 
-_return: hcf
+_return: mov _return, rP
 
 @segment rodata
-    _str: string "hello world!\0"
+    _str:   string "hello world!!!\0"
