@@ -13,8 +13,8 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         mov imm16, dreg             0x06 0b000110 RD
         mov $imm16, reg             0x07 0b000111 RD
         mov $imm16, imm16           0x08 0b001000 DD
-        mov $dreg, imm16            0x3C 0b001000 RD
-        mov $dreg, reg              0x3D 0b001000 RR
+        mov $dreg, imm16            0x3C 0b111100 RD
+        mov $dreg, reg              0x3D 0b111101 RR
 
     add (op1), (op2)            (op1) = (op1) + (op2)
         add reg, reg                0x09 0b001001 RR
