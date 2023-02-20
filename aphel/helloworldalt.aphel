@@ -1,16 +1,16 @@
 @segment text
-    @global _main
+    @global main
 
-_main: mov _str, rJ
-_loop:
+main: mov str, rJ
+loop:
     mov $rJ, rA
     cmp rA, '\0'
-    jif 1, _return
+    jif 1, return
     mov rA, 0xffff
     add rJ, 1
-    mov _loop, rP
+    mov loop, rP
 
-_return: mov _return, rP
+return: mov return, rP
 
 @segment rodata
-   _str:   string "hello world!!!\0"
+   str:   string "hello world!!!\0"
