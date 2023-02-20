@@ -39,31 +39,31 @@ var
     Path: string
     AphelionImage: string
 
-proc `$`(s: seq[array[4, string]]): string =
-    for element in s:
-        result.add $element
-        result.add "\n"
+# proc `$`(s: seq[array[4, string]]): string =
+#     for element in s:
+#         result.add $element
+#         result.add "\n"
 
-proc prettyS(s: seq[array[4, string]]): string =
-    for element in s:
-        result.add element[0]
-        result.add "\t"
-        if element[0] == "": result.add "\t │ "
-        else: result.add " ╪ "
-        result.add element[1]
-        result.add "\t"
-        result.add element[2]
-        result.add "\t"
-        result.add element[3]
-        result.add "\n"
+# proc prettyS(s: seq[array[4, string]]): string =
+#     for element in s:
+#         result.add element[0]
+#         result.add "\t"
+#         if element[0] == "": result.add "\t │ "
+#         else: result.add " ╪ "
+#         result.add element[1]
+#         result.add "\t"
+#         result.add element[2]
+#         result.add "\t"
+#         result.add element[3]
+#         result.add "\n"
 
-proc prettyS(s: Table[string, int]): string =
-    for symbol, address in s.pairs:
-        result.add symbol
-        result.add "\t"
-        result.add " ╪ $"
-        result.add toHex(address,4)
-        result.add "\n"
+# proc prettyS(s: Table[string, int]): string =
+#     for symbol, address in s.pairs:
+#         result.add symbol
+#         result.add "\t"
+#         result.add " ╪ $"
+#         result.add toHex(address,4)
+#         result.add "\n"
 
 proc error(errortype, message: string) =
     styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message

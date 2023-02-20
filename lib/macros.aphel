@@ -27,6 +27,13 @@
     jif 1, loc
 @endmacro
 
+@macro jens loc
+    mov rF, rGL
+    not rGL
+    mov rGL, rF
+    jif 1, loc
+@endmacro
+
 @macro jeq loc
     jif 4, loc
 @endmacro
