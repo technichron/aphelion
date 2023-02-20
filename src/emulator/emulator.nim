@@ -106,7 +106,7 @@ proc loadAMG(memarray: var array[0x10000, uint8], path: string) =
                 memarray[index] = uint8(amg[index])
         else:
                 error("Error", "\"" & path & "\"" & ": expected 65536 bytes, got " & $len(amg) & " bytes")
-    except IOError:
+    except:
         error("Error", "could not open " & "\"" & path & "\"")
 
 proc getInstructionFormat(opcode: uint8): string =

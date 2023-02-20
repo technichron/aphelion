@@ -231,7 +231,10 @@ proc handleImports(f: string): string =
     for line in f.splitLines():
         if line == "": continue
         if line.splitWhitespace()[0] != "@import": continue
-        result = result.replace(line, readFile(addFileExt(line.splitWhitespace()[1],"aphel")))
+        try:
+            result = result.replace(line, readFile(addFileExt(line.splitWhitespace()[1],"aphel")))
+        except:
+            error("Error", "could not open " & "\"" & addFileExt(line.splitWhitespace()[1],"aphel") & "\"")
 
 proc populate(assemblyfile: string) =
     
