@@ -20,14 +20,11 @@
     jif 1, loc
 @endmacro
 
-@macro jnz loc
-    mov rF, rGL
-    not rGL
-    mov rGL, rF
-    jif 1, loc
+@macro jens loc
+    jnz loc
 @endmacro
 
-@macro jens loc
+@macro jnz loc
     mov rF, rGL
     not rGL
     mov rGL, rF
