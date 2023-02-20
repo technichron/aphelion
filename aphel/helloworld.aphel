@@ -15,4 +15,4 @@ _loop:
 _return: jmp _return
 
 @segment rodata
-   _str:   string "hello world!!!\0"
+   _str: string "hello world!!!\0"
