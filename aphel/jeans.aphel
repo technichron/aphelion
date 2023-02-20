@@ -1,0 +1,8 @@
+@import lib\macros
+
+@segment text
+	@global main
+
+main: jeans
+
+loop: jmp loop

@@ -139,6 +139,45 @@ proc clean(file: string): string = # does exactly what it sounds like it does: c
         result.add lines[l]
         if l < lines.high: result.add "\n" 
 
+proc dealWithMacros(f: string): string =
+
+    var file = f
+
+    while file.find("@macro") != -1:
+
+        var macroText = file[file.find("@macro")..(file.find("@endmacro")+8)]
+        file = file.replace(file[file.find("@macro")..(file.find("@endmacro")+8)], "")
+
+        let macroName = macroText.splitWhitespace()[1]
+        let numOfArgs = macroText.splitLines()[0].splitWhitespace().len - 2
+        var argSeq: seq[string]
+
+        for x in 1..numOfArgs:
+            argSeq.add macroText.splitLines()[0].splitWhitespace()[x+1]
+
+        while file.find("\n" & macroName) != -1 or file.find(" " & macroName) != -1:
+            var lineToReplace = ""
+            var argsToReplace: seq[string]
+            for line in file.splitLines:
+                if line.find(macroName) == -1: continue
+                lineToReplace = line
+                break
+
+            if lineToReplace.splitWhitespace().len - 1 != numOfArgs:
+                error("Invalid Argument","incorrect number of arguments for \"" & macroName & "\"")
+
+            for x in 1..numOfArgs:
+                argsToReplace.add lineToReplace.splitWhitespace()[x]
+
+            var replacementText = macroText.multiReplace((macroText.splitLines()[0]&"\n",""),("@endmacro",""))
+            
+            for arg in 0..numOfArgs-1:
+                replacementText = replacementText.replace(argSeq[arg], argsToReplace[arg])
+            
+            file = file.replace(lineToReplace, replacementText)
+    file = file.clean
+    return file
+
 proc decify(file: string): string = # turns all integer types and characters into decimal values for easier parsing later
     var lines = file.splitLines()
     for x in 0..1: # iteration times
@@ -146,7 +185,7 @@ proc decify(file: string): string = # turns all integer types and characters int
             lines[l] = lines[l].strip
             lines[l].add(" ")
             if find(lines[l], '\'') != -1:
-                let character =  lines[l][find(lines[l], '\'')..find(lines[l], '\'', find(lines[l], '\'')+1)]
+                let character =  lines[l][find(lines[l], '\'')..rfind(lines[l], '\'', find(lines[l], '\'')+1)]
                 try: lines[l] = lines[l].replace(character, $codepage[character[1..(character.len-2)]])
                 except:
                     error("Invalid Argument", "[" & $l & "] invalid char: " & character)
@@ -173,10 +212,10 @@ proc decify(file: string): string = # turns all integer types and characters int
             if find(lines[l], '\"') != -1:
                 var str = ""
                 try:
-                    str = lines[l][find(lines[l], '\"')..find(lines[l], '\"', find(lines[l], '\"')+1)]
+                    str = lines[l][find(lines[l], '\"')..rfind(lines[l], '\"', find(lines[l], '\"')+1)]
                     lines[l] = lines[l].replace(str, str.replace(" ", "\\_").strip(chars = {'\'', '\"'})) #\_ is escape code for space
                 except:
-                    str = lines[l][find(lines[l], '\"')..find(lines[l], Whitespace, find(lines[l], '\"')+1)]
+                    str = lines[l][find(lines[l], '\"')..rfind(lines[l], Whitespace, find(lines[l], '\"')+1)]
                     error("Invalid Argument", "[" & $l & "] invalid string: " & str)
             if lines[l].split[0].endsWith(':') and lines[l].split.len > 1:
                 var line = lines[l].split
@@ -186,6 +225,13 @@ proc decify(file: string): string = # turns all integer types and characters int
     for l in 0..lines.high:
         result.add lines[l]
         if l < lines.high: result.add "\n"
+
+proc handleImports(f: string): string =
+    result = f
+    for line in f.splitLines():
+        if line == "": continue
+        if line.splitWhitespace()[0] != "@import": continue
+        result = result.replace(line, readFile(addFileExt(line.splitWhitespace()[1],"aphel")))
 
 proc populate(assemblyfile: string) =
     
@@ -393,7 +439,7 @@ proc nameToOpcodeAndSuch() =
             of "dreg int":  TextTable[i][1] = "35"
             else: error("Invalid Arguments", "\"" & argTypes(TextTable[i]) & "\" are not valid arguments for \"scmp\"")
         
-        of "shl":
+        of "shl", "asl", "lsl":
             case argTypes(TextTable[i])
             of "reg int":   TextTable[i][1] = "36"
             of "dreg int":  TextTable[i][1] = "37"
@@ -621,8 +667,10 @@ proc constructImage() =
 proc main() = 
     loadCMDLineArguments()
     var aphelFile = readFile(Path)
+    aphelFile = aphelfile.handleImports()
     aphelFile = aphelFile.decify()
     aphelFile = aphelFile.clean()
+    aphelFile = aphelFile.dealWithMacros()
     populate(aphelFile)
     breakoutITable()
     generalChecks()

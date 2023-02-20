@@ -1,18 +1,18 @@
-@segment text
-    @global main
+@import lib\macros
 
-main:
-    out 'H'
-    out 'e'
-    out 'l'
-    out 'l'
-    out 'o'
-    out ' '
-    out 'W'
-    out 'o'
-    out 'r'
-    out 'l'
-    out 'd'
-    out '!'
-    out '\n'
-    hcf
+@segment text
+    @global _main
+
+_main: mov _str, rJ
+_loop:
+    mov $rJ, rA
+    cmp rA, '\0'
+    jez _return
+    out rA
+    add rJ, 1
+    jmp _loop
+
+_return: jmp _return
+
+@segment rodata
+   _str:   string "hello world!!!\0"
