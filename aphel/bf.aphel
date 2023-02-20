@@ -1,0 +1,70 @@
+@import lib/macros
+
+# rI contains the pointer to the current BF instruction
+# rA contains the current BF instruction
+# rK contains the BF interpreters read/write head pointer
+
+@segment text
+	@global entry
+
+entry: mov prog, rI #initialize rI to location of prog
+
+loop:
+	mov $rI, rA
+
+	cmp rA, '>'
+	ceq ranglebracket
+	cmp rA, '<'
+	ceq langlebracket
+	cmp rA, '+'
+	ceq plus
+	cmp rA, '-'
+	ceq minus
+	cmp rA, '.'
+	ceq period
+	cmp rA, ','
+	ceq comma
+	cmp rA, '['
+	ceq rsquarebracket
+	cmp rA, ']'
+	ceq lsquarebracket
+	cmp rA, '\0'
+	jne loop
+	jmp end
+
+ranglebracket:
+	add rK, 1
+	ret
+
+langlebracket:
+	sub rK, 1
+	ret
+
+plus:
+	mov $rK, rB
+	add rB, 1
+	mov rb, $rK
+	ret
+
+minus:
+	mov $rK, rB
+	sub rB, 1
+	mov rb, $rK
+	ret
+
+period:
+	out $rK
+	ret
+
+comma:
+	in $rK
+	ret
+
+rsquarebracket:
+
+lsquarebracket:
+
+end: jmp end
+
+@segment rodata
+	prog: string "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.\0"

@@ -1,4 +1,4 @@
-@import lib\macros
+@import lib/macros
 
 @segment text
     @global _main
