@@ -1,6 +1,6 @@
 
 # ╔═══════════════════════╗
-# ║ APHELION EMULATOR 2.0 ║
+# ║ APHELION EMULATOR 2.0 ║ by technichron
 # ╚═══════════════════════╝
 
 import std/strutils, std/bitops, std/os, std/math, std/terminal, std/parseopt, pixie, sdl2

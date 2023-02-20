@@ -1,4 +1,3 @@
 general:
-	finish assembler features
-		macros, imports/includes
-	keyboard input for the emulator
+	keyboard input queue for the emulator
+	big centralized program that calls every element

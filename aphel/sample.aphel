@@ -1,5 +1,5 @@
 @segment text
-    global main
+    @global main
 
 @define asciistart, 'a'
 @define asciiend, 'Z'

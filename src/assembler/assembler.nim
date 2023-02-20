@@ -117,7 +117,8 @@ proc loadCMDLineArguments() =
             #         EchoIns = true
             of cmdArgument:
                 Path = p.key
-            else: discard
+            else: 
+                discard
 
 proc clean(file: string): string = # does exactly what it sounds like it does: clean comments and remove commas
     var lines = file.splitLines()
@@ -236,11 +237,23 @@ proc handleImports(f: string): string =
         except:
             error("Error", "could not open " & "\"" & addFileExt(line.splitWhitespace()[1],"aphel") & "\"")
 
+proc handleDefine(f: string): string =
+    result = f
+    for line in f.splitLines():
+        if line == "": continue
+        if line.splitWhitespace()[0] != "@define": continue
+        try:
+            result = result.replaceWord(line.splitWhitespace()[2],line.splitWhitespace()[1])
+            result = result.replace(line, "")
+        except:
+            error("Error", "could not resolve " & "\"" & line & "\"")
+
 proc populate(assemblyfile: string) =
     
     ITable.add ["","","",""]
     
     var l = 0
+    
     for currentLine in assemblyfile.splitLines:
         inc l
         if currentLine.endsWith(':'):
@@ -671,6 +684,7 @@ proc main() =
     loadCMDLineArguments()
     var aphelFile = readFile(Path)
     aphelFile = aphelfile.handleImports()
+    aphelFile = aphelfile.handleDefine()
     aphelFile = aphelFile.decify()
     aphelFile = aphelFile.clean()
     aphelFile = aphelFile.dealWithMacros()
