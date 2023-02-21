@@ -189,7 +189,7 @@ loadCMDLineArguments()
 MemorySpace.loadAMG(BinaryPath)
 writeDoubleRegister(0x0FFF0, StackPointer)
 
-#var runtime = 0;
+var runtime = 0
 var running = true
 while running:
 
@@ -276,6 +276,9 @@ while running:
         of 0x3d:    # mov $dreg, reg             0x3D 0b001000 RR
             writeRegister(read(readDoubleRegister(IB[1])), IB[2])
             EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov $" & dregName(IB[1]) & " " & regName(IB[2]))
+        of 0x3e:    # mov reg, $dreg             0x3E 0b111101 RR
+            write(readRegister(IB[1]),read(readDoubleRegister(IB[2])))
+            EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov " & regName(IB[1]) & " $" & dregName(IB[2]))
 
         # add (op1), (op2)            (op1) = (op1) + (op2)
 
@@ -568,6 +571,6 @@ while running:
             error("Error", "invalid opcode at " & $(readDoubleRegister(ProgramCounter)-getInstructionLength(opcode).uint16))
             running = false
     
-    # if runtime == 20: running = false
+    if runtime == 30: running = false
         
-    # runtime+=1
+    runtime+=1

@@ -6,6 +6,12 @@
 import std/strutils, std/sequtils, std/terminal, std/tables, std/os, std/parseopt, std/bitops
 from std/unicode import graphemeLen
 
+type
+    AphMacro* = object
+        name*: string
+        args*: seq[string]
+        body*: string
+
 const 
     codepage = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":0x05,"♠":0x06,"•":0x07,"\\b":0x08,"○":0x09,"\\n":0x0A,"\\c":0x0B,"\\r":0x0C,"♪":0x0D,"\\i":0x0E,"\\d":0x0F,
                   "►":0x10,"◄":0x11,"↕":0x12,"‼":0x13,"¶":0x14,"§":0x15,"▬":0x16,"↨":0x17,"↑":0x18,"↓":0x19,"→":0x1A,"←":0x1B,"∟":0x1C,"↔":0x1D,"▲":0x1E,"▼":0x1F,
@@ -75,7 +81,7 @@ proc getInstructionFormat(opcode: string): string =
             return "NA"
         of "1e", "1f", "22", "23", "2c", "2d":
             return "RE"
-        of "02", "03", "09", "0b", "0d", "0f", "11", "13", "15", "17", "24", "26", "28", "2a", "2e", "30", "32", "34", "3d":
+        of "02", "03", "09", "0b", "0d", "0f", "11", "13", "15", "17", "24", "26", "28", "2a", "2e", "30", "32", "34", "3d", "3e":
             return "RR"
         of "20":
             return "BY"
@@ -142,41 +148,34 @@ proc clean(file: string): string = # does exactly what it sounds like it does: c
 
 proc dealWithMacros(f: string): string =
 
+    var macros: seq[AphMacro]
+
     var file = f
 
-    while file.find("@macro") != -1:
+    while file.find("@macro") != -1: # ingest macros
+        let currentMacroStr = file[file.find("@macro")+7..file.find("@endmacro")-2]
+        file = file.replace(file[file.find("@macro")..file.find("@endmacro")+9], "")
+        var currentMacro = AphMacro(name: currentMacroStr.splitWhitespace[0])
+        currentMacro.args = currentMacroStr.splitLines[0].splitWhitespace[1..currentMacroStr.splitLines[0].splitWhitespace.high]
+        currentMacro.body = currentMacroStr.splitLines[1..currentMacroStr.splitLines.high].join("\n")
+        macros.add currentMacro
 
-        var macroText = file[file.find("@macro")..(file.find("@endmacro")+8)]
-        file = file.replace(file[file.find("@macro")..(file.find("@endmacro")+8)], "")
+    for m in macros: # insert macros
+        for l in file.splitLines:
+            if l == "": continue
+            if l.splitWhitespace[0] != m.name: continue
+            if l.splitWhitespace.len == 1:
+                file = file.replace(l, m.body)
+                continue
 
-        let macroName = macroText.splitWhitespace()[1]
-        let numOfArgs = macroText.splitLines()[0].splitWhitespace().len - 2
-        var argSeq: seq[string]
+            let lArgs = l.splitWhitespace[1..l.splitWhitespace.high]
 
-        for x in 1..numOfArgs:
-            argSeq.add macroText.splitLines()[0].splitWhitespace()[x+1]
-
-        while file.find("\n" & macroName) != -1 or file.find(" " & macroName) != -1:
-            var lineToReplace = ""
-            var argsToReplace: seq[string]
-            for line in file.splitLines:
-                if line.find(macroName) == -1: continue
-                lineToReplace = line
-                break
-
-            if lineToReplace.splitWhitespace().len - 1 != numOfArgs:
-                error("Invalid Argument","incorrect number of arguments for \"" & macroName & "\"")
-
-            for x in 1..numOfArgs:
-                argsToReplace.add lineToReplace.splitWhitespace()[x]
-
-            var replacementText = macroText.multiReplace((macroText.splitLines()[0]&"\n",""),("@endmacro",""))
+            var newBody = m.body
+            for a in 0..lArgs.high:
+                newBody = newBody.replace(m.args[a],lArgs[a])
             
-            for arg in 0..numOfArgs-1:
-                replacementText = replacementText.replace(argSeq[arg], argsToReplace[arg])
-            
-            file = file.replace(lineToReplace, replacementText)
-    file = file.clean
+            file = file.replace(l, newBody)
+
     return file
 
 proc decify(file: string): string = # turns all integer types and characters into decimal values for easier parsing later
@@ -350,6 +349,7 @@ proc nameToOpcodeAndSuch() =
             of "address int":       TextTable[i][1] = "08"
             of "address_dreg int":  TextTable[i][1] = "3c"
             of "address_dreg reg":  TextTable[i][1] = "3d"
+            of "reg address_dreg":  TextTable[i][1] = "3e"
             else: error("Invalid Arguments", "\"" & argTypes(TextTable[i]) & "\" are not valid arguments for \"mov\"")
 
         of "add":

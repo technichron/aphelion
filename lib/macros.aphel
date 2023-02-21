@@ -1,11 +1,11 @@
 @segment text
 
-@macro out op
-    mov op, 0xFFFF
+@macro in reg
+    mov $0xFFFF, reg
 @endmacro
 
-@macro in reg
-    mov 0xFFFF, reg
+@macro out op
+    mov op, 0xFFFF
 @endmacro
 
 @macro jmp loc

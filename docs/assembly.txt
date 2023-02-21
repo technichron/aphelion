@@ -15,6 +15,7 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         mov $imm16, imm16           0x08 0b001000 DD
         mov $dreg, imm16            0x3C 0b111100 RD
         mov $dreg, reg              0x3D 0b111101 RR
+        mov reg, $dreg              0x3E 0b111101 RR
 
     add (op1), (op2)            (op1) = (op1) + (op2)
         add reg, reg                0x09 0b001001 RR
@@ -100,9 +101,6 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
     lsr (op), (amount)          logical bit shift (op) right (amount) bits
         lsr reg, imm8               0x3A 0b111010 RB
         lsr dreg, imm8              0x3B 0b111011 RB
-
-    ext                         undefined - may be used for isa extensions
-                                    0x3E 0b111110 NA
 
     hcf                         halt and catch fire
         hcf                         0x3F 0b111111 NA
