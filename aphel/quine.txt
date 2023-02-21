@@ -1,0 +1,20 @@
+@segment text 
+@global _main 
+ 
+_main:
+  mov _str, rJ 
+_loop:
+ 
+mov $rJ, rA 
+cmp rA, 0 
+jif 1, _return 
+mov rA, 65535 
+add rJ, 1 
+mov _loop, rP 
+ 
+_return:
+  mov _return, rP 
+ 
+@segment rodata 
+_str:
+  file aphel/quine.aphel 
