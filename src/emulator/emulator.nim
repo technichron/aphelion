@@ -162,7 +162,9 @@ proc readRegister(code: int): uint8 =
     return Registers[code]
 
 proc writeRegister(value: uint8, code: int) =
-    if regName(code) == "rINV": error("Error", "invalid register write")
+    if regName(code) == "rINV": 
+        #echo code, " ", value
+        error("Error", "invalid register write")
     Registers[code] = value
 
 proc readDoubleRegister(code: int): uint16 =
@@ -256,7 +258,7 @@ while running:
             writeDoubleRegister(readDoubleRegister(IB[1]), IB[2])
             EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov " & dregName(IB[1]) & " " & dregName(IB[2]))
         of 0x04:    # mov imm8, reg               0x04 0b000100 RB
-            writeRegister(IB[1].uint8, IB[2])
+            writeRegister(IB[2].uint8, IB[1])
             EchoIns.debugPrint(toHex(CIL,4) & " ╪ mov" & $IB[1] & " " & regName(IB[2])) 
         of 0x05:    # mov imm8, $imm16            0x05 0b000101 BD
             write(IB[1].uint8, IB[2])
@@ -571,6 +573,6 @@ while running:
             error("Error", "invalid opcode at " & $(readDoubleRegister(ProgramCounter)-getInstructionLength(opcode).uint16))
             running = false
     
-    if runtime == 30: running = false
+    # if runtime == 30: running = false
         
-    runtime+=1
+    # runtime+=1

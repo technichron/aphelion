@@ -229,7 +229,7 @@ proc decify(file: string): string = # turns all integer types and characters int
 proc handleImports(f: string): string =
     result = f
     for line in f.splitLines():
-        if line == "": continue
+        if line.isEmptyOrWhitespace: continue
         if line.splitWhitespace()[0] != "@import": continue
         try:
             result = result.replace(line, readFile(addFileExt(line.splitWhitespace()[1],"aphel")))
@@ -239,7 +239,7 @@ proc handleImports(f: string): string =
 proc handleDefine(f: string): string =
     result = f
     for line in f.splitLines():
-        if line == "": continue
+        if line.isEmptyOrWhitespace: continue
         if line.splitWhitespace()[0] != "@define": continue
         try:
             result = result.replaceWord(line.splitWhitespace()[2],line.splitWhitespace()[1])
