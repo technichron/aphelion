@@ -5,13 +5,7 @@
 
 import std/strutils, std/sequtils, std/terminal, std/tables, std/os, std/parseopt, std/bitops
 from std/unicode import graphemeLen
-
-type
-    tokenType = enum
-        Literal, Directive, Label, Text
-    Token = object
-        ttype: tokenType
-        value: string
+import def, lexer, parser
 
 const 
     codepage = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":0x05,"♠":0x06,"•":0x07,"\\b":0x08,"○":0x09,"\\n":0x0A,"\\c":0x0B,"\\r":0x0C,"♪":0x0D,"\\i":0x0E,"\\d":0x0F,
@@ -34,7 +28,6 @@ const
 
 var 
     Path: string
-    TokenList: seq[Token]
 
 proc error(errortype, message: string) =
     styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message
@@ -55,7 +48,7 @@ proc loadArgs() =
 # proc cleanAndCondense(a: var string) =
 #     while a.contains("'"):
 
-proc decify(file: string): string = # turns all integer types and characters into decimal values for easier parsing later
+proc decify(file: string): string = # sanitizes literals
     var lines = file.splitLines()
     for x in 0..1: # iteration times
         for l in 0..lines.high():
@@ -90,7 +83,7 @@ proc decify(file: string): string = # turns all integer types and characters int
                 var str = ""
                 try:
                     str = lines[l][find(lines[l], '\"')..rfind(lines[l], '\"', find(lines[l], '\"')+1)]
-                    lines[l] = lines[l].replace(str, str.replace(" ", "\\_").strip(chars = {'\'', '\"'})) #\_ is escape code for space
+                    lines[l] = lines[l].replace(str, str.replace(" ", "\\x20").strip(chars = {'\'', '\"'}))
                 except:
                     str = lines[l][find(lines[l], '\"')..rfind(lines[l], Whitespace, find(lines[l], '\"')+1)]
                     error("Invalid Argument", "[" & $l & "] invalid string: " & str)
@@ -103,13 +96,11 @@ proc decify(file: string): string = # turns all integer types and characters int
         result.add lines[l]
         if l < lines.high: result.add "\n"
 
-proc populateTokenList(a: string) =
-    for t in tokenize(a, seps = Whitespace + {','}):
-        if t.isSep: continue
-        echo t.token
+# ------------------------------------------------------------------------- #
 
 loadArgs()
-var assembly = readFile(Path)
-assembly = assembly.decify()
-populateTokenList(assembly)
-writeFile(Path.changeFileExt("txt"), assembly)
+var assemblyText = readFile(Path)
+assemblyText = assemblyText.decify()
+var assm = assemblyText.lex()
+assm = assm.parse()
+writeFile(Path.changeFileExt("txt"), $assm)

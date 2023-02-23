@@ -118,10 +118,10 @@ SEGMENTATION
 
 
     supported data types:   * little endian
-        uint8       8 bit unsigned integer
-        sint8       8 bit signed integer
-        uint16      16 bit unsigned integer
-        sint16      16 bit signed integer
+        u8          8 bit unsigned integer
+        i8          8 bit signed integer
+        u16         16 bit unsigned integer
+        i16         16 bit signed integer
         char        8 bit ascii character
         string      sequence of chars
         file        file

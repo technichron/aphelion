@@ -4,7 +4,7 @@
 main: mov str, rJ
 loop:
     mov $rJ, rA
-    cmp rA, '\0'
+    cmp rA, $'\0'
     jif 1, return
     mov rA, 0xffff
     add rJ, 1
@@ -13,4 +13,4 @@ loop:
 return: mov return, rP
 
 @segment rodata
-   str:   string "hello world!!!\0"
+   str:   string "hello world!\0"

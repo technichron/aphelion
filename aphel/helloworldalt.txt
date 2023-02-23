@@ -1,0 +1,55 @@
+         @segment ╪ Directive
+             text ╪ Literal
+                  ╪ NewLine
+          @global ╪ Directive
+             main ╪ Literal
+                  ╪ NewLine
+                  ╪ NewLine
+            main: ╪ Label
+                  ╪ NewLine
+              mov ╪ Instruction
+              str ╪ Literal
+               rJ ╪ Register
+                  ╪ NewLine
+            loop: ╪ Label
+                  ╪ NewLine
+                  ╪ NewLine
+              mov ╪ Instruction
+              $rJ ╪ AddressRegister
+               rA ╪ Register
+                  ╪ NewLine
+              cmp ╪ Instruction
+               rA ╪ Register
+               $0 ╪ AddressLiteral
+                  ╪ NewLine
+              jif ╪ Instruction
+                1 ╪ Literal
+           return ╪ Literal
+                  ╪ NewLine
+              mov ╪ Instruction
+               rA ╪ Register
+            65535 ╪ Literal
+                  ╪ NewLine
+              add ╪ Instruction
+               rJ ╪ Register
+                1 ╪ Literal
+                  ╪ NewLine
+              mov ╪ Instruction
+             loop ╪ Literal
+               rP ╪ Register
+                  ╪ NewLine
+                  ╪ NewLine
+          return: ╪ Label
+                  ╪ NewLine
+              mov ╪ Instruction
+           return ╪ Literal
+               rP ╪ Register
+                  ╪ NewLine
+                  ╪ NewLine
+         @segment ╪ Directive
+           rodata ╪ Literal
+                  ╪ NewLine
+             str: ╪ Label
+                  ╪ NewLine
+           string ╪ Datatype
+hello\x20world!\0 ╪ Literal
