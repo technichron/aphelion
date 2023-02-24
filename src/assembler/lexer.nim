@@ -1,14 +1,16 @@
 import std/strutils, std/re
 import def
 
+# fuck regex
+
 proc lex*(a: string): seq[Token] =
     let b = a.multiReplace(("\n", " \n "),("#", " # "))
     for t in tokenize(b, seps = (Whitespace + {','} - {'\n'})):
         if t.isSep: continue
 
-        var currentToken = Token(val: t.token, t: Literal) # literal by default
+        var currentToken = Token(val: t.token, t: Literal) # literal until proven otherwise
 
-        if currentToken.val.match(re"\n"):
+        if currentToken.val.match(re"\n"): # yes i know its a bunch of elifs dont @ me
             currentToken.t = NewLine
         elif currentToken.val.match(re"(@)\w+"):
             currentToken.t = Directive

@@ -1,7 +1,7 @@
 @segment text
     @global main
 
-main: mov str, rJ
+main: mov str, rJ # bruh
 loop:
     mov $rJ, rA
     cmp rA, $'\0'
