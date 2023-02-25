@@ -13,6 +13,7 @@ loop:
     mov loop, rP
 
 return: mov return, rP
+    hcf bruh rA
 
 @segment rodata
    str:   string "hello world!\0"

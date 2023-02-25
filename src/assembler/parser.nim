@@ -30,7 +30,7 @@ proc parse*(a: seq[Token]): seq[Token] =
 
             assm.delete(cStart..cEnd)
     
-    block checkArguments: # checks instruction and directive arguments
+    block checkInstructionArguments: # checks instruction arguments
         
         var tokenPointer = 0
 
@@ -48,71 +48,93 @@ proc parse*(a: seq[Token]): seq[Token] =
                 a
 
             case assm[tokenPointer].val:
-                of "nop":
-                    if arguments.len != 0:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'nop\'")
-                of "mov":
-                    if arguments.getTokenTypes notin movArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'mov\'")
-                of "add":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'add\'")
-                of "adc":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'adc\'")
-                of "sub":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'sub\'")
-                of "sbb":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'sbb\'")
-                of "jif":
-                    if arguments.getTokenTypes notin jmpcallArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'jif\'")
-                of "cif":
-                    if arguments.getTokenTypes notin jmpcallArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'cif\'")
-                of "ret":
-                    if arguments.len != 0:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'ret\'")
-                of "push":
-                    if arguments.getTokenTypes notin pushArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'push\'")
-                of "pop":
-                    if arguments.getTokenTypes notin regdregArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'pop\'")
-                of "and":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'and\'")
-                of "or":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'or\'")
-                of "not":
-                    if arguments.getTokenTypes notin regdregArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'not\'")
-                of "cmp":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'cmp\'")
-                of "scmp":
-                    if arguments.getTokenTypes notin funcArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'scmp\'")
-                of "shl":
-                    if arguments.getTokenTypes notin shiftArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'shl\'")
-                of "asr":
-                    if arguments.getTokenTypes notin shiftArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'asr\'")
-                of "lsr":
-                    if arguments.getTokenTypes notin shiftArgTypes:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'lsr\'")
-                of "hcf":
-                    if arguments.len != 0:
-                        error("Error", $arguments.getTokenTypes & " are not valid args for \'hcf\'")
-                else:
-                    # echo assm[tokenPointer].val
-                    # echo getTokenTypes(arguments)
-                    error("Error", "unrecognized instruction: " & assm[tokenPointer].val)
-                    discard
+            of "nop":
+                if arguments.len != 0:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'nop\'")
+            of "mov":
+                if arguments.getTokenTypes notin movArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'mov\'")
+            of "add":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'add\'")
+            of "adc":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'adc\'")
+            of "sub":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'sub\'")
+            of "sbb":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'sbb\'")
+            of "jif":
+                if arguments.getTokenTypes notin jmpcallArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'jif\'")
+            of "cif":
+                if arguments.getTokenTypes notin jmpcallArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'cif\'")
+            of "ret":
+                if arguments.len != 0:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'ret\'")
+            of "push":
+                if arguments.getTokenTypes notin pushArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'push\'")
+            of "pop":
+                if arguments.getTokenTypes notin regdregArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'pop\'")
+            of "and":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'and\'")
+            of "or":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'or\'")
+            of "not":
+                if arguments.getTokenTypes notin regdregArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'not\'")
+            of "cmp":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'cmp\'")
+            of "scmp":
+                if arguments.getTokenTypes notin funcArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'scmp\'")
+            of "shl":
+                if arguments.getTokenTypes notin shiftArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'shl\'")
+            of "asr":
+                if arguments.getTokenTypes notin shiftArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'asr\'")
+            of "lsr":
+                if arguments.getTokenTypes notin shiftArgTypes:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'lsr\'")
+            of "hcf":
+                if arguments.len != 0:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'hcf\'")
+            else:
+                # echo assm[tokenPointer].val
+                # echo getTokenTypes(arguments)
+                error("Error", "unrecognized instruction: " & assm[tokenPointer].val)
+                discard
             tokenPointer += arguments.len + 1
+
+    # block checkDirectiveArguments:
+
+    #     var tokenPointer = 0
+
+    #     while tokenPointer < assm.len:
+    #         if assm[tokenPointer].t != Directive: 
+    #             inc tokenPointer
+    #             continue
+
+    #         var arguments = block:
+    #             var a: seq[Token]
+    #             var i = 1
+    #             while assm[tokenPointer+i].t != NewLine:
+    #                 a.add assm[tokenPointer+i]
+    #                 inc i
+    #             a
+
+    #         case assm[tokenPointer].t # add more directive options later maybe
+    #         of "@segment":
+    #             if arguments !=
+
 
     return assm

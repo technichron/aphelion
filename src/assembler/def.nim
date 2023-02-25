@@ -29,6 +29,13 @@ proc `$`*(a: seq[Token]): string =
     for t in a:
         result.add t.val & " "
 
+proc `$`*(a: seq[TokenType]): string =
+    result.add "("
+    for t in 0..a.high:
+        result.add $a[t]
+        if t != a.high: result.add ", "
+    result.add ")"
+
 proc pretty*(a: seq[Token]): string =
     var max: int
     for t in a:
