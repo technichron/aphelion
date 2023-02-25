@@ -1,12 +1,14 @@
 @segment text
     @global main
 
+@define out, 0xffff
+
 main: mov str, rJ # bruh
 loop:
     mov $rJ, rA
-    cmp rA, $'\0'
+    cmp rA, '\0'
     jif 1, return
-    mov rA, 0xffff
+    mov rA, out
     add rJ, 1
     mov loop, rP
 

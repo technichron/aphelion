@@ -4,23 +4,25 @@
           @global │ Directive
              main │ Literal
                   │ NewLine
+          @define │ Directive
+              out │ Literal
+            65535 │ Literal
                   │ NewLine
             main: │ Label
                   │ NewLine
               mov │ Instruction
               str │ Literal
-               rJ │ Register
+               rJ │ DoubleRegister
                   │ NewLine
             loop: │ Label
                   │ NewLine
-                  │ NewLine
               mov │ Instruction
-              $rJ │ AddressRegister
+              $rJ │ AddressDoubleRegister
                rA │ Register
                   │ NewLine
               cmp │ Instruction
                rA │ Register
-               $0 │ AddressLiteral
+                0 │ Literal
                   │ NewLine
               jif │ Instruction
                 1 │ Literal
@@ -28,23 +30,21 @@
                   │ NewLine
               mov │ Instruction
                rA │ Register
-            65535 │ Literal
+              out │ Literal
                   │ NewLine
               add │ Instruction
-               rJ │ Register
+               rJ │ DoubleRegister
                 1 │ Literal
                   │ NewLine
               mov │ Instruction
              loop │ Literal
-               rP │ Register
-                  │ NewLine
+               rP │ DoubleRegister
                   │ NewLine
           return: │ Label
                   │ NewLine
               mov │ Instruction
            return │ Literal
-               rP │ Register
-                  │ NewLine
+               rP │ DoubleRegister
                   │ NewLine
          @segment │ Directive
            rodata │ Literal
@@ -53,3 +53,4 @@
                   │ NewLine
            string │ Datatype
 hello\x20world!\0 │ Literal
+                  │ NewLine

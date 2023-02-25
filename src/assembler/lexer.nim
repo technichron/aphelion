@@ -10,14 +10,18 @@ proc lex*(a: string): seq[Token] =
 
         var currentToken = Token(val: t.token, t: Literal) # literal until proven otherwise
 
-        if currentToken.val.match(re"\n"): # yes i know its a bunch of elifs dont @ me
+        if currentToken.val.match(re"\n"): # yes i know its a bunch of elifs and its bad dont @ me
             currentToken.t = NewLine
         elif currentToken.val.match(re"(@)\w+"):
             currentToken.t = Directive
-        elif currentToken.val.match(re"^[rR][a-zA-Z][hlHL]?$"):
+        elif currentToken.val.match(re"^[rR][a-fA-F]$"):
             currentToken.t = Register
-        elif currentToken.val.match(re"\$[rR][a-zA-Z][hlHL]?"):
-            currentToken.t = AddressRegister
+        elif currentToken.val.match(re"^[rR][gijkpsrxyGIJKPSRXY][hlHL]$"):
+            currentToken.t = Register
+        elif currentToken.val.match(re"^[rR][gijkpsrxyGIJKPSRXY]$"):
+            currentToken.t = DoubleRegister
+        elif currentToken.val.match(re"\$[rR][gijkpsrxyGIJKPSRXY]"):
+            currentToken.t = AddressDoubleRegister
         elif currentToken.val.match(re"[0-9]+"):
             currentToken.t = Literal
         elif currentToken.val.match(re"\$[0-9]+"):
@@ -33,4 +37,9 @@ proc lex*(a: string): seq[Token] =
         elif currentToken.val.match(re"^#"):
             currentToken.t = Comment
     
+        try:    # weeds out duplicate newlines
+            if currentToken.t == NewLine and result[result.high].t == NewLine:
+                continue
+        except: discard
+
         result.add currentToken

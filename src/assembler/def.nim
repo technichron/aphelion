@@ -1,4 +1,4 @@
-import std/strutils, std/tables
+import std/strutils, std/tables, std/terminal
 
 const codepage* = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":0x05,"♠":0x06,"•":0x07,"\\b":0x08,"○":0x09,"\\n":0x0A,"\\c":0x0B,"\\r":0x0C,"♪":0x0D,"\\i":0x0E,"\\d":0x0F,
                   "►":0x10,"◄":0x11,"↕":0x12,"‼":0x13,"¶":0x14,"§":0x15,"▬":0x16,"↨":0x17,"↑":0x18,"↓":0x19,"→":0x1A,"←":0x1B,"∟":0x1C,"↔":0x1D,"▲":0x1E,"▼":0x1F,
@@ -18,18 +18,54 @@ const codepage* = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":
                   "≡":0xF0,"±":0xF1,"≥":0xF2,"≤":0xF3,"⌠":0xF4,"⌡":0xF5,"÷":0xF6,"≈":0xF7,"°":0xF8,"∙":0xF9,"·":0xFA,"√":0xFB,"ⁿ":0xFC,"²":0xFD,"■":0xFE,"\\a":0xFF}.toTable()
 
 type
-    tokentype* = enum
-        Directive, Label, Instruction, Literal, Register, AddressLiteral, AddressRegister, Datatype, NewLine, Comment
+    TokenType* = enum
+        Directive, Label, Instruction, Literal, Register, DoubleRegister, AddressDoubleRegister, AddressLiteral, Datatype, NewLine, Comment
 type
     Token* = object
-        t*: tokenType
+        t*: TokenType
         val*: string
 
 proc `$`*(a: seq[Token]): string =
+    for t in a:
+        result.add t.val & " "
+
+proc pretty*(a: seq[Token]): string =
     var max: int
     for t in a:
         if t.val.len > max: max = t.val.len
     for t in a:
         result.add align(t.val.replace("\n", ""), max) & " │ " & $t.t & "\n"
-    # for t in a:
-    #     result.add t.val & " "
+
+proc error*(errortype, message: string) =
+    styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message
+    quit(0)
+
+const movArgTypes* = [@[Register, Literal],
+                      @[Register, Register], 
+                      @[DoubleRegister, DoubleRegister],
+                      @[Literal, Register],
+                      @[Literal, Literal],
+                      @[Literal, DoubleRegister],
+                      @[AddressLiteral, Register],
+                      @[AddressLiteral, Literal],
+                      @[AddressDoubleRegister, Literal],
+                      @[AddressDoubleRegister, Register],
+                      @[Register, AddressDoubleRegister]]
+
+const funcArgTypes* = [@[Register, Register],
+                       @[Register, Literal],
+                       @[DoubleRegister, DoubleRegister],
+                       @[DoubleRegister, Literal]]
+
+const jmpcallArgTypes* = [@[Literal, Literal],
+                          @[Literal, DoubleRegister]]
+
+const pushArgTypes* = [@[Register],
+                       @[DoubleRegister],
+                       @[Literal]]
+
+const regdregArgTypes* = [@[Register],
+                          @[DoubleRegister]]
+
+const shiftArgTypes* = [@[Register, Literal],
+                        @[DoubleRegister, Literal]]
