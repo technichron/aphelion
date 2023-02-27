@@ -6,7 +6,7 @@ proc parse*(a: seq[Token]): seq[Token] =
     var assm = a
     
     block cleanComments: # remove comments
-        for x in 0..10:
+        while true:
 
             var cStart = 0
             var cEnd = 0
@@ -24,7 +24,7 @@ proc parse*(a: seq[Token]): seq[Token] =
 
             if not cFound: break
             assm.delete(cStart..cEnd)
-            break
+            
 
     block checkInstructionArguments: # check instruction arguments
         

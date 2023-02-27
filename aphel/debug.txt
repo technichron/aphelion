@@ -56,3 +56,6 @@
              string │ Datatype
 "hello\x20world!\0" │ Literal
                     │ NewLine
+                    │ NewLine
+                    │ NewLine
+                    │ NewLine
