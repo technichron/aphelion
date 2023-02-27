@@ -1,4 +1,4 @@
-import std/strutils, std/tables
+import std/strutils
 import def
 
 proc preprocess*(file: string): string =
