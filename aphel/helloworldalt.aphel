@@ -1,18 +1,20 @@
 @segment text
     @global main
 
-@define out, 0xffff
+@define stdout, 0xffff
 
 main: mov str, rJ # bruh
 loop:
     mov $rJ, rA
     cmp rA, '\0'
     jif 1, return
-    mov rA, out
+    mov rA, stdout
     add rJ, 1
     mov loop, rP
 
-return: mov return, rP
+return: jmp return
 
-@segment rodata
+@org 0x9000
+
+@segment data
    str:   string "hello world!\0"

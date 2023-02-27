@@ -1,16 +1,12 @@
-import std/sequtils
+import std/sequtils, std/tables, std/re, std/strutils
 import def
-
-proc getTokenTypes(a: seq[Token]): seq[TokenType] =
-    for entry in a:
-        result.add entry.t
 
 proc parse*(a: seq[Token]): seq[Token] =
     
     var assm = a
-
+    
     block cleanComments: # remove comments
-        while true:
+        for x in 0..10:
 
             var cStart = 0
             var cEnd = 0
@@ -27,15 +23,15 @@ proc parse*(a: seq[Token]): seq[Token] =
                     break
 
             if not cFound: break
-
             assm.delete(cStart..cEnd)
-    
-    block checkInstructionArguments: # checks instruction arguments
+            break
+
+    block checkInstructionArguments: # check instruction arguments
         
         var tokenPointer = 0
 
         while tokenPointer < assm.len:
-            if assm[tokenPointer].t != Instruction: 
+            if assm[tokenPointer].t != InstructionToken: 
                 inc tokenPointer
                 continue
 
@@ -112,29 +108,114 @@ proc parse*(a: seq[Token]): seq[Token] =
                 # echo assm[tokenPointer].val
                 # echo getTokenTypes(arguments)
                 error("Error", "unrecognized instruction: " & assm[tokenPointer].val)
-                discard
             tokenPointer += arguments.len + 1
 
-    # block checkDirectiveArguments:
+    block checkDirectiveArguments: # check directive arguments
 
-    #     var tokenPointer = 0
+        var tokenPointer = 0
 
-    #     while tokenPointer < assm.len:
-    #         if assm[tokenPointer].t != Directive: 
-    #             inc tokenPointer
-    #             continue
+        while tokenPointer < assm.len:
+            if assm[tokenPointer].t != Directive: 
+                inc tokenPointer
+                continue
 
-    #         var arguments = block:
-    #             var a: seq[Token]
-    #             var i = 1
-    #             while assm[tokenPointer+i].t != NewLine:
-    #                 a.add assm[tokenPointer+i]
-    #                 inc i
-    #             a
+            var arguments = block:
+                var a: seq[Token]
+                var i = 1
+                while assm[tokenPointer+i].t != NewLine:
+                    a.add assm[tokenPointer+i]
+                    inc i
+                a
 
-    #         case assm[tokenPointer].t # add more directive options later maybe
-    #         of "@segment":
-    #             if arguments !=
+            case assm[tokenPointer].val
+            of "@segment":
+                if arguments.len != 1:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'@segment\'")
+                if arguments[0].val notin ["text", "data"]:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- \'" & arguments[0].val & "\' is not a valid argument for \'@segment\'")
+            of "@define":
+                if arguments.len != 2:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'@define\'")
+            of "@import":
+                if arguments.len != 2:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'@import\'")
+            of "@global":
+                if arguments.len != 1:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'@global\'")
+            of "@org":
+                if arguments.len != 1:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid args for \'@org\'")
+            else:
+                error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- \'" & assm[tokenPointer].val & "\' is not a recognized directive")
+            tokenPointer += arguments.len + 1
+
+    block checkDataTypeArgs:
+        var tokenPointer = 0
+
+        while tokenPointer < assm.len:
+            if assm[tokenPointer].t != Datatype: 
+                inc tokenPointer
+                continue
+
+            var arguments = block:
+                var a: seq[Token]
+                var i = 1
+                while assm[tokenPointer+i].t != NewLine:
+                    a.add assm[tokenPointer+i]
+                    inc i
+                a
+            
+            if arguments.len != 1:
+                    error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- " & $arguments.getTokenTypes & " are not valid datatype arguments")
+            if arguments[0].t != Literal:
+                error("Error", $assm[tokenPointer..tokenPointer+arguments.len] & "- \'" & arguments[0].val & "\' is of type " & $arguments.getTokenTypes & ", (Literal) required")
+
+            
+            tokenPointer += arguments.len + 1
+
+    block checkOneGlobal:
+        if count(assm.getTokenValues, "@global") != 1:
+            error("Error", $count(assm.getTokenValues, "@global") & " \'@global\' directives found")
+
+    block translateLiterals:
+
+        var tokenPointer = 0
+
+        while tokenPointer < assm.len:
+            if assm[tokenPointer].t != Literal: 
+                inc tokenPointer
+                continue
+
+            if assm[tokenPointer].val.match(re"('.*')"):
+                let character = assm[tokenPointer].val
+                try: 
+                    assm[tokenPointer].val = $(codepage[character[1..character.high-1]])
+                except:
+                    error("Error", " invalid char: " & character)
+            
+            if assm[tokenPointer].val.match(re"0[xX][0-9a-fA-F]*"):
+                let num = assm[tokenPointer].val
+                try: 
+                    assm[tokenPointer].val = $fromHex[int](num[2..num.high])
+                except:
+                    error("Error", " invalid hexadecimal number: " & num)
+
+            if assm[tokenPointer].val.match(re"0[oO][0-8]*"):
+                let num = assm[tokenPointer].val
+                try: 
+                    assm[tokenPointer].val = $fromOct[int](num[2..num.high])
+                except:
+                    error("Error", " invalid octal number: " & num)
+            
+            if assm[tokenPointer].val.match(re"0[bB][0-1]*"):
+                let num = assm[tokenPointer].val
+                try: 
+                    assm[tokenPointer].val = $fromBin[int](num[2..num.high])
+                except:
+                    error("Error", " invalid binary number: " & num)
+
+
+            inc tokenPointer
 
 
     return assm

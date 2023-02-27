@@ -1,56 +1,58 @@
-         @segment │ Directive
-             text │ Literal
-                  │ NewLine
-          @global │ Directive
-             main │ Literal
-                  │ NewLine
-          @define │ Directive
-              out │ Literal
-            65535 │ Literal
-                  │ NewLine
-            main: │ Label
-                  │ NewLine
-              mov │ Instruction
-              str │ Literal
-               rJ │ DoubleRegister
-                  │ NewLine
-            loop: │ Label
-                  │ NewLine
-              mov │ Instruction
-              $rJ │ AddressDoubleRegister
-               rA │ Register
-                  │ NewLine
-              cmp │ Instruction
-               rA │ Register
-                0 │ Literal
-                  │ NewLine
-              jif │ Instruction
-                1 │ Literal
-           return │ Literal
-                  │ NewLine
-              mov │ Instruction
-               rA │ Register
-              out │ Literal
-                  │ NewLine
-              add │ Instruction
-               rJ │ DoubleRegister
-                1 │ Literal
-                  │ NewLine
-              mov │ Instruction
-             loop │ Literal
-               rP │ DoubleRegister
-                  │ NewLine
-          return: │ Label
-                  │ NewLine
-              mov │ Instruction
-           return │ Literal
-               rP │ DoubleRegister
-                  │ NewLine
-         @segment │ Directive
-           rodata │ Literal
-                  │ NewLine
-             str: │ Label
-                  │ NewLine
-           string │ Datatype
-hello\x20world!\0 │ Literal
-                  │ NewLine
+           @segment │ Directive
+               text │ Literal
+                    │ NewLine
+            @global │ Directive
+               main │ Literal
+                    │ NewLine
+            @define │ Directive
+             stdout │ Literal
+              65535 │ Literal
+                    │ NewLine
+              main: │ Label
+                    │ NewLine
+                mov │ InstructionToken
+                str │ Literal
+                 rJ │ DoubleRegister
+                    │ NewLine
+              loop: │ Label
+                    │ NewLine
+                mov │ InstructionToken
+                $rJ │ AddressDoubleRegister
+                 rA │ Register
+                    │ NewLine
+                cmp │ InstructionToken
+                 rA │ Register
+                  0 │ Literal
+                    │ NewLine
+                jif │ InstructionToken
+                  1 │ Literal
+             return │ Literal
+                    │ NewLine
+                mov │ InstructionToken
+                 rA │ Register
+             stdout │ Literal
+                    │ NewLine
+                add │ InstructionToken
+                 rJ │ DoubleRegister
+                  1 │ Literal
+                    │ NewLine
+                mov │ InstructionToken
+               loop │ Literal
+                 rP │ DoubleRegister
+                    │ NewLine
+            return: │ Label
+                    │ NewLine
+                jmp │ Literal
+             return │ Literal
+                    │ NewLine
+               @org │ Directive
+              36864 │ Literal
+                    │ NewLine
+           @segment │ Directive
+               data │ Literal
+                    │ NewLine
+               str: │ Label
+                    │ NewLine
+             string │ Datatype
+"hello\x20world!\0" │ Literal
+                    │ NewLine

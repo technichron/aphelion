@@ -106,15 +106,12 @@ BASE INSTRUCTION SET                opcode-hex opcode-binary argument-type
         hcf                         0x3F 0b111111 NA
 
 SEGMENTATION
-    
+
     @segment text
         defines a segment of assembly code. refer to the above for assembly syntax
-    
-    @segment rodata
-        defines a segment of data in ROM space.
 
     @segment data
-        defines a segment of data in RAM space.
+        defines a segment of data.
 
 
     supported data types:   * little endian

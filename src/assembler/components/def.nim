@@ -19,15 +19,27 @@ const codepage* = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":
 
 type
     TokenType* = enum
-        Directive, Label, Instruction, Literal, Register, DoubleRegister, AddressDoubleRegister, AddressLiteral, Datatype, NewLine, Comment
-type
+        Directive, Label, InstructionToken, Literal, Register, DoubleRegister, AddressDoubleRegister, AddressLiteral, Datatype, NewLine, Comment
+
     Token* = object
         t*: TokenType
         val*: string
+    
+    InstructionFormat* = enum
+        NA, RE, RR, BY, RB, DO, RD, BD, DD
+
+    Instruction* = object
+        label*: string
+        opcode*: uint8
+        arg1*: Token
+        arg2*: Token
+        len*: uint8
+        format*: InstructionFormat
 
 proc `$`*(a: seq[Token]): string =
     for t in a:
-        result.add t.val & " "
+        result.add t.val
+        if t.t != NewLine: result.add " "
 
 proc `$`*(a: seq[TokenType]): string =
     result.add "("
@@ -43,9 +55,18 @@ proc pretty*(a: seq[Token]): string =
     for t in a:
         result.add align(t.val.replace("\n", ""), max) & " │ " & $t.t & "\n"
 
+proc getTokenTypes*(a: seq[Token]): seq[TokenType] =
+    for entry in a:
+        result.add entry.t
+
+proc getTokenValues*(a: seq[Token]): seq[string] =
+    for entry in a:
+        result.add entry.val
+
 proc error*(errortype, message: string) =
     styledEcho styleDim, fgRed, errortype, ":", fgDefault, styleDim, " ", message
     quit(0)
+
 
 const movArgTypes* = [@[Register, Literal],
                       @[Register, Register], 
@@ -76,3 +97,4 @@ const regdregArgTypes* = [@[Register],
 
 const shiftArgTypes* = [@[Register, Literal],
                         @[DoubleRegister, Literal]]
+
