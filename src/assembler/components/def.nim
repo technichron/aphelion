@@ -19,7 +19,7 @@ const codepage* = {"\\0":0x00,"☺":0x01,"☻":0x02,"♥":0x03,"♦":0x04,"♣":
 
 type
     TokenType* = enum
-        Directive, Label, InstructionToken, Literal, Register, DoubleRegister, AddressDoubleRegister, AddressLiteral, Datatype, NewLine, Comment
+        Directive, Label, InstructionToken, Literal, Register, DoubleRegister, AddressDoubleRegister, AddressLiteral, DatatypeToken, NewLine, Comment
 
     Token* = object
         t*: TokenType
@@ -33,8 +33,14 @@ type
         opcode*: uint8
         arg1*: Token
         arg2*: Token
-        len*: uint8
         format*: InstructionFormat
+    
+    Datatype* = enum
+        str, u8, u16, i8, i16, file
+
+    Data* = object
+        label*: string
+        datatype*: Datatype
 
 proc `$`*(a: seq[Token]): string =
     for t in a:

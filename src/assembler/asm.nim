@@ -34,11 +34,11 @@ var assmTxt = readFile(LoadPath).preprocess
 var assm = assmTxt.lex
 assm = assm.parse
 
-if StorePath != "":
-    writeFile(StorePath, pretty(assm))
-else:
-    writeFile(LoadPath.changeFileExt("txt"), pretty(assm))
 # if StorePath != "":
-#     writeFile(StorePath, $assm)
+#     writeFile(StorePath, pretty(assm))
 # else:
-#     writeFile(LoadPath.changeFileExt("txt"), $assm)
+#     writeFile(LoadPath.changeFileExt("txt"), pretty(assm))
+if StorePath != "":
+    writeFile(StorePath, $assm)
+else:
+    writeFile(LoadPath.changeFileExt("txt"), $assm)

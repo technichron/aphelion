@@ -1,61 +1,19 @@
-           @segment │ Directive
-               text │ Literal
-                    │ NewLine
-            @global │ Directive
-               main │ Literal
-                    │ NewLine
-            @define │ Directive
-             stdout │ Literal
-              65535 │ Literal
-                    │ NewLine
-              main: │ Label
-                    │ NewLine
-                mov │ InstructionToken
-                str │ Literal
-                 rJ │ DoubleRegister
-                    │ NewLine
-              loop: │ Label
-                    │ NewLine
-                mov │ InstructionToken
-                $rJ │ AddressDoubleRegister
-                 rA │ Register
-                    │ NewLine
-                cmp │ InstructionToken
-                 rA │ Register
-                  0 │ Literal
-                    │ NewLine
-                jif │ InstructionToken
-                  1 │ Literal
-             return │ Literal
-                    │ NewLine
-                mov │ InstructionToken
-                 rA │ Register
-             stdout │ Literal
-                    │ NewLine
-                add │ InstructionToken
-                 rJ │ DoubleRegister
-                  1 │ Literal
-                    │ NewLine
-                mov │ InstructionToken
-               loop │ Literal
-                 rP │ DoubleRegister
-                    │ NewLine
-            return: │ Label
-                    │ NewLine
-                jmp │ Literal
-             return │ Literal
-                    │ NewLine
-               @org │ Directive
-              36864 │ Literal
-                    │ NewLine
-           @segment │ Directive
-               data │ Literal
-                    │ NewLine
-               str: │ Label
-                    │ NewLine
-             string │ Datatype
-"hello\x20world!\0" │ Literal
-                    │ NewLine
-                    │ NewLine
-                    │ NewLine
-                    │ NewLine
+@segment text 
+@global main 
+@define stdout 65535 
+main: 
+mov str rJ 
+loop: 
+mov $rJ rA 
+cmp rA 0 
+jif 1 return 
+mov rA stdout 
+add rJ 1 
+mov loop rP 
+return: 
+jmp return 
+@org 36864 
+@segment data 
+str: 
+string "hello\x20world!\0" 
+add rA 1 

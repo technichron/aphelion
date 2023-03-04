@@ -177,6 +177,8 @@ proc parse*(a: seq[Token]): seq[Token] =
         if count(assm.getTokenValues, "@global") != 1:
             error("Error", $count(assm.getTokenValues, "@global") & " \'@global\' directives found")
 
+    #return assm
+
     block translateLiterals:
 
         var tokenPointer = 0
