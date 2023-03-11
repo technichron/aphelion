@@ -12,8 +12,7 @@ add rJ 1
 mov loop rP 
 return: 
 jmp return 
-@org 36864 
+@org 3840 
 @segment data 
 str: 
 string "hello\x20world!\0" 
-add rA 1 

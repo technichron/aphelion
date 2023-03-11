@@ -14,7 +14,7 @@ loop:
 
 return: jmp return
 
-@org 0x9000
+@org 0x0f00
 
 @segment data
    str:   string "hello world!\0"

@@ -22,7 +22,7 @@ proc lex*(a: string): seq[Token] =
             currentToken.t = DoubleRegister
         elif currentToken.val.match(re"\$[rR][gijkpsrxyGIJKPSRXY]"):
             currentToken.t = AddressDoubleRegister
-        elif currentToken.val.match(re"[0-9]+"):
+        elif currentToken.val.match(re"[0-9_]+"):
             currentToken.t = Literal
         elif currentToken.val.match(re"\$[0-9]+"):
             currentToken.t = AddressLiteral
@@ -33,7 +33,7 @@ proc lex*(a: string): seq[Token] =
         elif currentToken.val.match(re"^(nop|mov|add|adc|sub|sbb|jif|cif|ret|push|pop|and|or|not|cmp|scmp|shl|asl|lsl|asr|lsr|hcf)$"):
             currentToken.t = InstructionToken
         elif currentToken.val.match(re"^(u8|i8|u16|i16|char|string|file)$"):
-            currentToken.t = Datatype
+            currentToken.t = DatatypeToken
         elif currentToken.val.match(re"^#"):
             currentToken.t = Comment
     

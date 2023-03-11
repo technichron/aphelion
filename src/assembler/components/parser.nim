@@ -153,7 +153,7 @@ proc parse*(a: seq[Token]): seq[Token] =
         var tokenPointer = 0
 
         while tokenPointer < assm.len:
-            if assm[tokenPointer].t != Datatype: 
+            if assm[tokenPointer].t != DatatypeToken: 
                 inc tokenPointer
                 continue
 
@@ -200,21 +200,21 @@ proc parse*(a: seq[Token]): seq[Token] =
                 try: 
                     assm[tokenPointer].val = $fromHex[int](num[2..num.high])
                 except:
-                    error("Error", " invalid hexadecimal number: " & num)
+                    error("Error", " invalid hexadecimal integer: " & num)
 
             if assm[tokenPointer].val.match(re"0[oO][0-8]*"):
                 let num = assm[tokenPointer].val
                 try: 
                     assm[tokenPointer].val = $fromOct[int](num[2..num.high])
                 except:
-                    error("Error", " invalid octal number: " & num)
+                    error("Error", " invalid octal integer: " & num)
             
             if assm[tokenPointer].val.match(re"0[bB][0-1]*"):
                 let num = assm[tokenPointer].val
                 try: 
                     assm[tokenPointer].val = $fromBin[int](num[2..num.high])
                 except:
-                    error("Error", " invalid binary number: " & num)
+                    error("Error", " invalid binary integer: " & num)
 
 
             inc tokenPointer
